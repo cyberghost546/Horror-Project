@@ -1,0 +1,2104 @@
+/* =========================================
+   Global base styles
+   These apply to the whole horror_blog site
+========================================= */
+body {
+    background-color: #020617;  /* Global dark background */
+    color: #e5e7eb;             /* Light text color */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Utility classes */
+.text-danger { color: #f60000; }
+.text-muted { color: #6b7280; }
+
+
+/* =========================================
+   Styles from about.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            color: #f9fafb;
+        }
+
+        h2 {
+            font-weight: 600;
+            color: #f9fafb;
+            font-size: 1.4rem;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .section-box {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-box:hover {
+            border-color: #f60000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
+            transition: 0.25s;
+        }
+
+        .highlight {
+            color: #f60000;
+            font-weight: 600;
+        }
+
+
+/* =========================================
+   Styles from category_stories.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .section-sub {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .story-card {
+            background-color: #0f172a;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            color: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+        }
+
+        .story-thumb {
+            height: 160px;
+            overflow: hidden;
+            background-color: #020617;
+        }
+
+        .story-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: #f87171;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .author {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .stat-chip {
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .breadcrumb a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #e5e7eb;
+        }
+
+
+/* =========================================
+   Styles from dashboard.php
+   Copied from original <style> in that file
+========================================= */
+.layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #020617;
+            border-right: 1px solid #111827;
+            padding: 16px 12px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .nav-section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin: 18px 0 6px 8px;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .side-link:hover,
+        .side-link.active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        .side-link span.icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        .main-area {
+            flex: 1;
+            background-color: #020617;
+        }
+
+        .main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #111827;
+        }
+
+        .main-content {
+            padding: 20px 24px 32px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border: 1px solid #111827;
+            border-radius: 14px;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        .table-dark-custom thead {
+            color: #9ca3af;
+        }
+
+        .table-dark-custom tbody tr td {
+            border-color: #111827;
+        }
+
+        .btn-outline-silent {
+            border-color: #374151;
+            color: #e5e7eb;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #4b5563;
+            color: #ffffff;
+        }
+
+
+/* =========================================
+   Styles from edit_story.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-
+
+        .form-control,
+        .form-select {
+            background-color: #020617;
+            border-color: #1f2937;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: none;
+        }
+
+        .btn-primary-silent {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #0b1120;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.4rem;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .story-thumb-preview {
+            max-width: 200px;
+            border-radius: 12px;
+            border: 1px solid #111827;
+            margin-bottom: 10px;
+        }
+
+
+/* =========================================
+   Styles from forgot_password.php
+   Copied from original <style> in that file
+========================================= */
+.auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 430px;
+            background-color: #0f172a;
+            border-radius: 20px;
+            border: 1px solid #1e293b;
+            padding: 28px;
+            box-shadow: 0 0 25px rgba(246, 0, 0, 0.25);
+        }
+
+        .auth-title {
+            color: #f60000;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .label-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .form-control {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0 !important;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus {
+            background-color: #1e293b;
+            border-color: #f60000;
+            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .btn-login {
+            background-color: #f60000;
+            color: #0f172a;
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-login:hover {
+            background-color: #ca0000;
+        }
+
+        .small-text {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .small-text a {
+            color: #f60000;
+            text-decoration: none;
+        }
+
+        .small-text a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-small {
+            font-size: 0.8rem;
+            padding: 0.45rem 0.6rem;
+            border-radius: 8px;
+        }
+
+
+/* =========================================
+   Styles from index.php
+   Copied from original <style> in that file
+========================================= */
+a {
+            text-decoration: none;
+        }
+
+        .hero-section {
+            position: relative;
+            margin-top: 24px;
+            margin-bottom: 40px;
+            padding: 48px 32px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: radial-gradient(circle at top left, #f60000 0, #111827 45%, #020617 80%);
+            color: #f9fafb;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 10% 0, rgba(255, 255, 255, 0.08) 0, transparent 55%), radial-gradient(circle at 90% 100%, rgba(0, 0, 0, 0.8) 0, transparent 60%);
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 560px;
+            z-index: 1;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: #fecaca;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: #e5e7eb;
+            max-width: 460px;
+            margin-bottom: 20px;
+        }
+
+        .hero-buttons a {
+            border-radius: 999px;
+        }
+
+        .btn-silent-primary {
+            background-color: #f60000;
+            color: #f9fafb;
+            box-shadow: 0 8px 20px rgba(246, 0, 0, 0.45);
+        }
+
+        .btn-silent-primary:hover {
+            background-color: #dc2626;
+            color: #f9fafb;
+            box-shadow: 0 12px 28px rgba(246, 0, 0, 0.6);
+        }
+
+        .btn-silent-ghost {
+            background-color: rgba(15, 23, 42, 0.85);
+            color: #f9fafb;
+            border-color: rgba(248, 250, 252, 0.2);
+        }
+
+        .btn-silent-ghost:hover {
+            background-color: rgba(15, 23, 42, 1);
+            color: #f9fafb;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #fecaca;
+            margin-top: 10px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background: #fecaca;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #f9fafb;
+        }
+
+        .story-card {
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #1f2933;
+            transition: border 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
+        }
+
+        .story-card:hover {
+            border-color: #f60000;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .story-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #f87171;
+        }
+
+        .story-title {
+            font-size: 16px;
+            color: #f9fafb;
+        }
+
+        .story-excerpt {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .story-meta {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .category-card {
+            background: #020617;
+            border-radius: 14px;
+            border: 1px solid #111827;
+            transition: border 0.15s ease, background 0.15s ease, transform 0.15s ease;
+        }
+
+        .category-card:hover {
+            border-color: #f60000;
+            background: #020817;
+            transform: translateY(-1px);
+        }
+
+        .community-box {
+            background: #020617;
+            border-radius: 18px;
+            border: 1px solid #111827;
+        }
+
+        .community-panel {
+            background: #020817;
+            border-radius: 16px;
+            border: 1px solid #1f2933;
+        }
+
+        .panel-label {
+            color: #9ca3af;
+        }
+
+        .panel-value {
+            color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .panel-live {
+            color: #f97373;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-section {
+                padding: 32px 20px;
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+        }
+
+
+/* =========================================
+   Styles from login.php
+   Copied from original <style> in that file
+========================================= */
+.auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 430px;
+            background-color: #0f172a;
+            border-radius: 20px;
+            border: 1px solid #1e293b;
+            padding: 28px;
+            box-shadow: 0 0 25px rgba(246, 0, 0, 0.25);
+        }
+
+        .auth-title {
+            color: #f60000;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .label-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .form-control {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0 !important;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus {
+            background-color: #1e293b;
+            border-color: #f60000;
+            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .btn-login {
+            background-color: #f60000;
+            color: #0f172a;
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-login:hover {
+            background-color: #ca0000;
+        }
+
+        .divider {
+            text-align: center;
+            color: #64748b;
+            margin: 18px 0;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            background-color: #0f172a;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            display: inline-block;
+            width: 30%;
+            border-bottom: 1px solid #1f2937;
+            vertical-align: middle;
+        }
+
+        .google-btn {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+        }
+
+        .google-btn:hover {
+            background-color: #293548;
+        }
+
+        .small-text {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .small-text a {
+            color: #f60000;
+            text-decoration: none;
+        }
+
+        .small-text a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-small {
+            font-size: 0.8rem;
+            padding: 0.45rem 0.6rem;
+            border-radius: 8px;
+        }
+
+
+/* =========================================
+   Styles from my_stories.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        .table-dark-custom thead {
+            color: #9ca3af;
+        }
+
+        .table-dark-custom tbody td {
+            border-color: #111827;
+        }
+
+        .badge-cat {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .badge-cat-true {
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+
+        .badge-cat-paranormal {
+            background-color: #22c55e;
+            color: #022c22;
+        }
+
+        .badge-cat-urban {
+            background-color: #eab308;
+            color: #1f2937;
+        }
+
+        .badge-cat-short {
+            background-color: #f97316;
+            color: #1f2937;
+        }
+
+        .badge-status {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 3px 9px;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 10px 10px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .action-form button {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+        }
+
+
+/* =========================================
+   Styles from profile.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .profile-header {
+      margin-bottom: 18px;
+    }
+
+    .profile-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .card-dark {
+      background-color: #020617;
+      border-radius: 16px;
+      border: 1px solid #111827;
+    }
+
+    .card-dark .card-header {
+      border-bottom-color: #111827;
+      font-size: 1rem;
+      color: #e5e7eb;
+    }
+
+    .avatar-lg {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 2px solid #111827;
+    }
+
+    .username-tag {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .meta-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+    }
+
+    .stat-number {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .text-muted-small {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .btn-outline-silent {
+      border-color: #4b5563;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      padding: 6px 16px;
+    }
+
+    .btn-outline-silent:hover {
+      background-color: #111827;
+      border-color: #6b7280;
+      color: #ffffff;
+    }
+
+    /* modal form styling */
+    .form-control {
+      background-color: #111827;
+      border-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    .form-control:focus {
+      border-color: #6366f1;
+      box-shadow: none;
+    }
+
+    .avatar-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 2px solid #1f2937;
+    }
+
+    .btn-save {
+      background-color: #1f2937;
+      color: #ffffff;
+      border-radius: 999px;
+    }
+
+    .btn-save:hover {
+      background-color: #111827;
+    }
+
+
+/* =========================================
+   Styles from reset_password.php
+   Copied from original <style> in that file
+========================================= */
+.auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-box {
+            background-color: #11131f;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            color: #ffffff;
+        }
+
+        .auth-box h1 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-control {
+            background-color: #1e2030;
+            border: 1px solid #333447;
+            color: #ffffff;
+        }
+
+        .form-control:focus {
+            background-color: #1e2030;
+            color: #ffffff;
+            border-color: #555577;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background-color: #4a90e2;
+            border-color: #4a90e2;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+            border-color: #357abd;
+        }
+
+        .alert {
+            margin-top: 1rem;
+        }
+
+
+/* =========================================
+   Styles from search.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .story-card {
+            background-color: #0f172a;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            color: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: #f87171;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+
+/* =========================================
+   Styles from signup.php
+   Copied from original <style> in that file
+========================================= */
+.card-modern {
+            width: 100%;
+            max-width: 430px;
+            margin: auto;
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 0 25px rgba(246, 0, 0, 0.25);
+        }
+
+        .card-modern h2 {
+            color: #f60000;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .label-text {
+            font-size: 0.85rem;
+            color: #eaeaeaff;
+        }
+
+        .form-control {
+            background-color: #1e293b;
+            border-color: #334155;
+             color: #ffffff !important;
+        }
+
+
+        .form-control:focus {
+            background-color: #1e293b;
+            border-color: #f60000;
+            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+        }
+
+        .btn-red {
+            background-color: #f60000;
+            color: #0f172a;
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .btn-red:hover {
+            background-color: #ca0000;
+        }
+
+        .divider {
+            text-align: center;
+            color: #64748b;
+            margin: 18px 0;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            background-color: #0f172a;
+        }
+
+        .google-btn {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 999px;
+        }
+
+        .google-btn:hover {
+            background-color: #293548;
+        }
+
+        .small-text {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 12px;
+        }
+
+        .small-text a {
+            color: #f60000;
+            text-decoration: none;
+        }
+
+        .small-text a:hover {
+            text-decoration: underline;
+        }
+
+
+/* =========================================
+   Styles from stories.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .story-card {
+            background-color: #0f172a;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            color: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+        }
+
+        .story-thumb {
+            height: 160px;
+            overflow: hidden;
+            background-color: #020617;
+        }
+
+        .story-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: #f87171;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .author {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .stat-chip {
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .category-card {
+            text-decoration: none;
+        }
+
+        .cat-box {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 18px 20px;
+            color: #e5e7eb;
+            transition: 0.2s;
+        }
+
+        .cat-box:hover {
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .cat-box h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #f8fafc;
+        }
+
+        .cat-box p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+
+/* =========================================
+   Styles from stories_list.php
+   Copied from original <style> in that file
+========================================= */
+.layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #020617;
+            border-right: 1px solid #111827;
+            padding: 16px 12px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .side-link:hover,
+        .side-link.active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        .side-link .icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        .main-area {
+            flex: 1;
+            background-color: #020617;
+        }
+
+        .main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #111827;
+        }
+
+        .main-content {
+            padding: 20px 24px 32px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border: 1px solid #111827;
+            border-radius: 14px;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        .table-dark-custom thead {
+            color: #9ca3af;
+        }
+
+        .table-dark-custom tbody tr td {
+            border-color: #111827;
+        }
+
+        .badge-cat {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .badge-cat-true {
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+
+        .badge-cat-paranormal {
+            background-color: #22c55e;
+            color: #022c22;
+        }
+
+        .badge-cat-urban {
+            background-color: #eab308;
+            color: #1f2937;
+        }
+
+        .badge-cat-short {
+            background-color: #f97316;
+            color: #1f2937;
+        }
+
+        .badge-published {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 3px 9px;
+        }
+
+        .filter-form .form-select,
+        .filter-form .form-control {
+            background-color: #020617;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        .filter-form .form-select:focus,
+        .filter-form .form-control:focus {
+            border-color: #818cf8;
+            box-shadow: none;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .action-form button {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+        }
+
+
+/* =========================================
+   Styles from stories_true.php
+   Copied from original <style> in that file
+========================================= */
+.story-card {
+    background:#0b1120;
+    border:1px solid #1e293b;
+    border-radius:18px;
+    padding:18px;
+    transition:0.2s;
+    cursor:pointer;
+}
+.story-card:hover {
+    border-color:#f60000;
+    transform:translateY(-3px);
+}
+.story-tag {
+    font-size:11px;
+    color:#f87171;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+}
+
+
+/* =========================================
+   Styles from story.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .breadcrumb a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #e5e7eb;
+        }
+
+        .story-card {
+            background-color: #020617;
+            border-radius: 18px;
+            border: 1px solid #111827;
+            padding: 22px 20px 26px;
+        }
+
+        .story-image {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background-color: #020617;
+            border: 1px solid #111827;
+        }
+
+        .story-image img {
+            width: 100%;
+            max-height: 660px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .story-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #f87171;
+        }
+
+        .story-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #f9fafb;
+        }
+
+        .story-meta {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background-color: #4b5563;
+        }
+
+        .author-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid #111827;
+        }
+
+        .author-name {
+            font-size: 0.85rem;
+            color: #e5e7eb;
+        }
+
+        .author-username {
+            font-size: 0.78rem;
+            color: #9ca3af;
+        }
+
+        .story-
+
+        .story-body p {
+            margin-bottom: 1rem;
+        }
+
+        .stats-row {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background-color: #020617;
+            border: 1px solid #111827;
+            font-size: 0.78rem;
+        }
+
+        .action-row {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.85rem;
+            border-radius: 999px;
+            padding: 6px 14px;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .btn-outline-silent.active {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #f9fafb;
+        }
+
+        .empty-state {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .empty-state h1 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        /* comments */
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid #111827;
+        }
+
+        .comment-author {
+            font-size: 0.85rem;
+            color: #e5e7eb;
+        }
+
+        .comment-meta {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .comment-
+
+        .comment-form textarea.form-control {
+            background-color: #0f172a;
+            border-color: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .comment-form textarea.form-control:focus {
+            border-color: #f60000;
+            box-shadow: none;
+        }
+
+        .btn-comment {
+            background-color: #1f2937;
+            color: #ffffff;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 6px 16px;
+        }
+
+        .btn-comment:hover {
+            background-color: #111827;
+        }
+
+        .comment-reply {
+            border-left: 1px solid #111827;
+            padding-left: 12px;
+            margin-top: 8px;
+        }
+
+
+/* =========================================
+   Styles from submit_story.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 18px;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-
+
+        .form-control,
+        .form-select {
+            background-color: #020617;
+            border-color: #1f2937;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: none;
+        }
+
+        .form-control::placeholder {
+            color: #6b7280;
+        }
+
+        textarea.form-control {
+            min-height: 220px;
+            resize: vertical;
+        }
+
+        .btn-primary-silent {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #0b1120;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.4rem;
+        }
+
+        .btn-primary-silent:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            color: #0b1120;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .small-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+
+/* =========================================
+   Styles from top.php
+   Copied from original <style> in that file
+========================================= */
+.page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .story-card {
+            background-color: #0f172a;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            color: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+        }
+
+        .card-
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: #f87171;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .author {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .stat-chip {
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .filter-pill {
+            border-radius: 999px;
+            border: 1px solid #4b5563;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            color: #e5e7eb;
+            text-decoration: none;
+        }
+
+        .filter-pill.active,
+        .filter-pill:hover {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #f9fafb;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+
+/* =========================================
+   Styles from users_list.php
+   Copied from original <style> in that file
+========================================= */
+.layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #020617;
+            border-right: 1px solid #111827;
+            padding: 16px 12px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .side-link.active,
+        .side-link:hover {
+            background-color: #111827;
+            color: #fff;
+        }
+
+        .main-area {
+            flex: 1;
+            background-color: #020617;
+        }
+
+        .main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #111827;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border: 1px solid #111827;
+            border-radius: 14px;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        form.role-form select {
+            background-color: #111827;
+            color: #e5e7eb;
+            border-color: #374151;
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+
+        form.role-form button {
+            border-radius: 6px;
+            padding: 3px 10px;
+        }
+
+
+/* =========================================
+   Styles from footer.php
+   Copied from original <style> in that file
+========================================= */
+.footer-dark {
+    background:#0b0f19;
+    border-top:1px solid #1f2937;
+}
+
+.footer-title {
+    color:#f8fafc;
+    font-weight:700;
+    text-shadow:0 0 8px rgba(255,0,0,0.4);
+}
+
+.footer-text {
+    color:#94a3b8;
+}
+
+.footer-sub {
+    color:#f1f5f9;
+    font-size:0.95rem;
+    margin-bottom:6px;
+    text-shadow:0 0 6px rgba(255,0,0,0.25);
+}
+
+.footer-list {
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.footer-link {
+    color:#94a3b8;
+    text-decoration:none;
+    transition:0.2s;
+}
+
+.footer-link:hover {
+    color:#f60000;
+    padding-left:4px;
+}
+
+.social-icon {
+    font-size:1.35rem;
+    color:#94a3b8;
+    transition:0.2s;
+}
+
+.social-icon:hover {
+    color:#f60000;
+    text-shadow:0 0 12px rgba(246,0,0,0.6);
+}
+
+.flicker-soft {
+    animation:flicker 4s infinite;
+    color:#e2e8f0;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity:1; }
+    45% { opacity:0.85; }
+    50% { opacity:0.55; }
+    53% { opacity:0.9; }
+    70% { opacity:0.8; }
+    80% { opacity:0.65; }
+}
+
+
+/* =========================================
+   Styles from header.php
+   Copied from original <style> in that file
+========================================= */
+.top-navbar {
+        background-color: #111827;
+        border-bottom: 1px solid #374151;
+    }
+
+    /* brand */
+    .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        background-color: #f9fafb;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .brand-text {
+        font-size: 1rem;
+        color: #e5e7eb;
+    }
+
+    /* nav links */
+    .navbar .nav-link {
+        color: #9ca3af;
+        font-size: 0.95rem;
+    }
+
+    .navbar .nav-link.active,
+    .navbar .nav-link:hover {
+        color: #ffffff;
+    }
+
+    /* search */
+    .search-input {
+        min-width: 220px;
+        border-radius: 999px;
+        background-color: #020617;
+        border: 1px solid #4b5563;
+        color: #e5e7eb;
+    }
+
+    .search-input::placeholder {
+        color: #6b7280;
+    }
+
+    .search-input:focus {
+        box-shadow: none;
+        border-color: #818cf8;
+    }
+
+    /* auth buttons */
+    .btn-warning {
+        background-color: #fb2424ff;
+        border-color: #fb2424ff;
+        color: #111827;
+    }
+
+    .btn-warning:hover {
+        background-color: #f50b0bc4;
+        border-color: #f50b0bc4;
+        color: #111827;
+    }
+
+    /* profile */
+    .btn-profile {
+        padding: 2px 4px;
+        background-color: transparent;
+        border: none;
+    }
+
+    .btn-profile:focus {
+        box-shadow: none;
+    }
+
+    .profile-img {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        object-fit: cover;
+    }
+
+    /* mobile tweaks */
+    @media (max-width: 992px) {
+        .search-input {
+            min-width: 140px;
+            margin-top: 8px;
+        }
+
+        .top-navbar .dropdown {
+            margin-top: 8px;
+        }
+    }

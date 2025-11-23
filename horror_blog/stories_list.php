@@ -1,0 +1,291 @@
+<?php session_start();
+require 'include/db.php';
+if (empty($_SESSION['user_id']) || empty($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+    header('Location: index.php');
+    exit;
+} /* HANDLE ACTIONS */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['story_id'], $_POST['action'])) {
+    $storyId = (int) $_POST['story_id'];
+    $action = $_POST['action'];
+    if ($storyId > 0) {
+        if ($action === 'toggle_featured') {
+            $stmt = $pdo->prepare('UPDATE stories SET is_featured = 1 - is_featured WHERE id = :id');
+            $stmt->execute([':id' => $storyId]);
+        } elseif ($action === 'toggle_publish') {
+            $stmt = $pdo->prepare('UPDATE stories SET is_published = 1 - is_published WHERE id = :id');
+            $stmt->execute([':id' => $storyId]);
+        } elseif ($action === 'delete') {
+            $stmt = $pdo->prepare('DELETE FROM stories WHERE id = :id');
+            $stmt->execute([':id' => $storyId]);
+        }
+    }
+    header('Location: stories_list.php?updated=1');
+    exit;
+} /* SEARCH + FILTER + SORT */
+$search = trim($_GET['q'] ?? '');
+$filter = $_GET['filter'] ?? 'all';
+$sort = $_GET['sort'] ?? '';
+$params = [];
+$sql = 'SELECT s.id, s.title, s.category, s.is_published, s.is_featured, s.views, s.likes, s.created_at, u.display_name, u.username FROM stories s JOIN users u ON u.id = s.user_id';
+$clauses = [];
+if ($search !== '') {
+    $clauses[] = '(s.title LIKE :q OR u.display_name LIKE :q OR u.username LIKE :q)';
+    $params[':q'] = '%' . $search . '%';
+}
+if ($filter === 'published') {
+    $clauses[] = 's.is_published = 1';
+} elseif ($filter === 'drafts') {
+    $clauses[] = 's.is_published = 0';
+} elseif ($filter === 'featured') {
+    $clauses[] = 's.is_featured = 1';
+}
+if ($clauses) {
+    $sql .= ' WHERE ' . implode(' AND ', $clauses);
+} /* SORTING */
+if ($sort === 'title_az') {
+    $sql .= ' ORDER BY s.title ASC';
+} elseif ($sort === 'title_za') {
+    $sql .= ' ORDER BY s.title DESC';
+} elseif ($sort === 'id_asc') {
+    $sql .= ' ORDER BY s.id ASC';
+} elseif ($sort === 'id_desc') {
+    $sql .= ' ORDER BY s.id DESC';
+} else {
+    $sql .= ' ORDER BY s.created_at DESC';
+}
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$stories = $stmt->fetchAll(); /* BUILD SORT URLS THAT KEEP SEARCH + FILTER */
+$baseParams = [];
+if ($search !== '') {
+    $baseParams['q'] = $search;
+}
+if ($filter !== 'all') {
+    $baseParams['filter'] = $filter;
+}
+$azParams = $baseParams;
+$azParams['sort'] = 'title_az';
+$zaParams = $baseParams;
+$zaParams['sort'] = 'title_za';
+$idAscParams = $baseParams;
+$idAscParams['sort'] = 'id_asc';
+$idDescParams = $baseParams;
+$idDescParams['sort'] = 'id_desc';
+$sortUrlAz = 'stories_list.php?' . http_build_query($azParams);
+$sortUrlZa = 'stories_list.php?' . http_build_query($zaParams);
+$sortUrlIdAsc = 'stories_list.php?' . http_build_query($idAscParams);
+$sortUrlIdDesc = 'stories_list.php?' . http_build_query($idDescParams); ?>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Stories | silent_evidence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body> <?php include 'include/header.php'; ?> <div class="layout-wrapper"> <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">silent_evidence</div>
+
+            <a href="dashboard.php" class="side-link">
+                <span class="icon">🏠</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="stories_list.php" class="side-link active">
+                <span class="icon">📖</span>
+                <span>Stories</span>
+            </a>
+            <a href="users_list.php" class="side-link">
+                <span class="icon">👥</span>
+                <span>Users</span>
+            </a>
+
+            <div style="margin-top:auto">
+                <a href="logout.php" class="side-link">
+                    <span class="icon">⏻</span>
+                    <span>Sign out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main-area">
+
+            <div class="main-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <h1 class="page-title mb-0">Stories</h1>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <form method="get" class="d-flex gap-2 filter-form">
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control form-control-sm"
+                            placeholder="Search title or author..."
+                            value="<?php echo htmlspecialchars($search); ?>">
+
+                        <select name="filter" class="form-select form-select-sm" style="max-width: 150px">
+                            <option value="all" <?php if ($filter === 'all') echo 'selected'; ?>>All</option>
+                            <option value="published" <?php if ($filter === 'published') echo 'selected'; ?>>Published</option>
+                            <option value="drafts" <?php if ($filter === 'drafts') echo 'selected'; ?>>Drafts</option>
+                            <option value="featured" <?php if ($filter === 'featured') echo 'selected'; ?>>Featured</option>
+                        </select>
+
+                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+
+                        <button class="btn btn-outline-silent btn-sm" type="submit">Apply</button>
+                    </form>
+
+                    <div class="d-flex flex-wrap gap-1">
+                        <a href="<?php echo htmlspecialchars($sortUrlAz); ?>" class="btn btn-outline-silent btn-sm">
+                            Title A to Z
+                        </a>
+                        <a href="<?php echo htmlspecialchars($sortUrlZa); ?>" class="btn btn-outline-silent btn-sm">
+                            Title Z to A
+                        </a>
+                        <a href="<?php echo htmlspecialchars($sortUrlIdAsc); ?>" class="btn btn-outline-silent btn-sm">
+                            ID 1 to 10
+                        </a>
+                        <a href="<?php echo htmlspecialchars($sortUrlIdDesc); ?>" class="btn btn-outline-silent btn-sm">
+                            ID 10 to 1
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+
+                <?php if (isset($_GET['updated'])): ?>
+                    <div class="alert alert-success py-2 small">
+                        Story updated
+                    </div>
+                <?php endif; ?>
+
+                <div class="card-dark">
+                    <div class="card-dark-header d-flex justify-content-between align-items-center">
+                        <span>Story list</span>
+                        <a href="submit_story.php" class="btn btn-outline-silent btn-sm">New story</a>
+                    </div>
+
+                    <div class="card-dark-body">
+                        <?php if (!$stories): ?>
+                            <p class="small text-muted mb-0">No stories found.</p>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover align-middle table-dark-custom mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Author</th>
+                                            <th>Category</th>
+                                            <th>Stats</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($stories as $s): ?>
+                                            <tr>
+                                                <td><?php echo (int)$s['id']; ?></td>
+                                                <td><?php echo htmlspecialchars($s['title']); ?></td>
+                                                <td>
+                                                    <?php echo htmlspecialchars($s['display_name'] ?: $s['username']); ?>
+                                                    <span class="text-muted small d-block">
+                                                        @<?php echo htmlspecialchars($s['username']); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    $cat   = $s['category'];
+                                                    $label = 'Other';
+                                                    $cls   = 'badge-cat';
+
+                                                    if ($cat === 'true') {
+                                                        $label = 'True story';
+                                                        $cls  .= ' badge-cat-true';
+                                                    } elseif ($cat === 'paranormal') {
+                                                        $label = 'Paranormal';
+                                                        $cls  .= ' badge-cat-paranormal';
+                                                    } elseif ($cat === 'urban') {
+                                                        $label = 'Urban legend';
+                                                        $cls  .= ' badge-cat-urban';
+                                                    } elseif ($cat === 'short') {
+                                                        $label = 'Short nightmare';
+                                                        $cls  .= ' badge-cat-short';
+                                                    }
+                                                    ?>
+                                                    <span class="<?php echo $cls; ?>">
+                                                        <?php echo htmlspecialchars($label); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="small text-muted">
+                                                        👁 <?php echo (int)$s['views']; ?>
+                                                        · ❤ <?php echo (int)$s['likes']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php if ($s['is_published']): ?>
+                                                        <span class="badge bg-success badge-published">Published</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary badge-published">Draft</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($s['is_featured']): ?>
+                                                        <span class="badge bg-warning text-dark badge-published ms-1">Featured</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?php echo date('d M Y', strtotime($s['created_at'])); ?></td>
+                                                <td>
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        <a href="story.php?id=<?php echo (int)$s['id']; ?>" class="btn btn-outline-silent btn-sm">
+                                                            View
+                                                        </a>
+
+                                                        <form method="post" class="d-inline action-form">
+                                                            <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
+                                                            <input type="hidden" name="action" value="toggle_publish">
+                                                            <button class="btn btn-outline-silent btn-sm" type="submit">
+                                                                <?php echo $s['is_published'] ? 'Unpublish' : 'Publish'; ?>
+                                                            </button>
+                                                        </form>
+
+                                                        <form method="post" class="d-inline action-form">
+                                                            <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
+                                                            <input type="hidden" name="action" value="toggle_featured">
+                                                            <button class="btn btn-outline-silent btn-sm" type="submit">
+                                                                <?php echo $s['is_featured'] ? 'Unfeature' : 'Feature'; ?>
+                                                            </button>
+                                                        </form>
+
+                                                        <form method="post" class="d-inline action-form" onsubmit="return confirm('Delete this story');">
+                                                            <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
+                                                            <input type="hidden" name="action" value="delete">
+                                                            <button class="btn btn-outline-danger btn-sm" type="submit">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
