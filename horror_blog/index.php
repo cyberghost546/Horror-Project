@@ -65,9 +65,7 @@ function se_category_label(string $cat): string
 </head>
 
 <body>
-    <?php
-    include 'include/header.php';
-    ?>
+    <?php include 'include/header.php';?>
     <main class="container py-4"> <!-- Hero section -->
 
         <!-- Featured Slideshow -->
@@ -93,7 +91,7 @@ function se_category_label(string $cat): string
                                 <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
                                     <img
                                         src="<?php echo htmlspecialchars($slide['image_url']); ?>"
-                                        class="d-block w-100"
+                                        class="d-block w-100 rounded-4"
                                         style="object-fit:cover;height:360px;">
                                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
                                         <h5><?php echo htmlspecialchars($slide['title']); ?></h5>
