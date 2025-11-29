@@ -48,7 +48,21 @@ function se_category_label(string $cat): string
     return strtoupper($cat);
 }
 
-
+// Load featured stories
+$featuredStmt = $pdo->query("
+SELECT
+id,
+title,
+category,
+content,
+created_at
+FROM stories
+WHERE is_published = 1
+AND is_featured = 1
+ORDER BY created_at DESC
+LIMIT 3
+");
+$featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -65,7 +79,7 @@ function se_category_label(string $cat): string
 </head>
 
 <body>
-    <?php include 'include/header.php';?>
+    <?php include 'include/header.php'; ?>
     <main class="container py-4"> <!-- Hero section -->
 
         <!-- Featured Slideshow -->
@@ -196,28 +210,40 @@ function se_category_label(string $cat): string
         <!-- Categories -->
         <section class="mb-5">
             <hr>
-            <!-- Paranormal Feature Card -->
-            <section class="mb-4">
-                <div class="paranormal-card p-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap"
-                    style="background:#0b0f19;border:1px solid #1a2233;">
 
-                    <div class="mb-3">
-                        <h2 class="text-light mb-2">Enter the Paranormal</h2>
-                        <p class="text-secondary mb-3" style="max-width:420px;">
-                            Ghosts, spirits, haunted houses, cursed objects. Explore the most unsettling corners of Silent Evidence.
-                        </p>
-                        <a href="stories.php?cat=paranormal"
-                            class="btn btn-silent-primary btn-sm px-4 py-2">
-                            Explore Paranormal Stories
-                        </a>
+            <!-- Featured / Paranormal Feature Card -->
+            <?php if (!empty($featuredStories)): ?>
+                <section class="mb-4">
+                    <div class="paranormal-card p-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap"
+                        style="background:#0b0f19;border:1px solid #1a2233;">
+
+                        <div class="mb-3">
+                            <h2 class="text-light mb-2">Featured on Silent Evidence</h2>
+                            <p class="text-secondary mb-3" style="max-width:420px;">
+                                Highlighted by our community. A collection of stories chosen by the admins to appear on the homepage.
+                            </p>
+
+                            <a href="stories.php?filter=featured" class="btn btn-silent-primary btn-sm px-4 py-2">
+                                View All Featured Stories
+                            </a>
+                        </div>
+
+                        <?php if (!empty($featuredStories[0])): ?>
+                            <a href="story.php?id=<?php echo (int)$featuredStories[0]['id']; ?>">
+                                <img
+                                    src="<?php echo !empty($featuredStories[0]['image'])
+                                                ? htmlspecialchars($featuredStories[0]['image'])
+                                                : 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80'; ?>"
+                                    class="rounded-4 shadow-lg"
+                                    style="width:260px;height:160px;object-fit:cover;border:1px solid #1f2937;">
+                            </a>
+                        <?php endif; ?>
                     </div>
+                </section>
+            <?php endif; ?>
 
-                    <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80"
-                        class="rounded-4 shadow-lg"
-                        style="width:260px;height:160px;object-fit:cover;border:1px solid #1f2937;">
-                </div>
-            </section>
             <hr>
+
 
             <div class="d-flex justify-content-between align-items-baseline mb-3">
                 <h2 class="section-title mb-0">Browse by vibe</h2>

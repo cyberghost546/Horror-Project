@@ -78,26 +78,55 @@ $userAvatar = $_SESSION['user_avatar'] ?? 'https://i.pravatar.cc/40';
                                     class="profile-img me-1">
                             </button>
 
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                <li class="dropdown-header small text-muted">
-                                    <?php echo htmlspecialchars($userName); ?>
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu">
+                                <li class="dropdown-header small text-muted px-3">
+                                    <div class="fw-semibold"> <?php echo htmlspecialchars($userName); ?> </div>
+                                    <div class="text-muted small"> Signed in </div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="profile.php">Profile</a>
+                                    <hr class="dropdown-divider my-1">
                                 </li>
+
                                 <li>
-                                    <a class="dropdown-item" href="my_stories.php">My stories</a>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="profile.php">
+                                        <span class="user-dropdown-icon">
+                                            ☰
+                                        </span>
+                                        <span>Account</span>
+                                    </a>
                                 </li>
+
                                 <li>
-                                    <hr class="dropdown-divider">
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="my_stories.php">
+                                        <span class="user-dropdown-icon">
+                                            ⚙
+                                        </span>
+                                        <span>Settings</span>
+                                    </a>
                                 </li>
+
+                                <?php if (!empty($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="dashboard.php">
+                                            <span class="user-dropdown-icon">
+                                                ★
+                                            </span>
+                                            <span>Admin dashboard</span>
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+
                                 <li>
-                                    <?php if (!empty($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                        <a class="dropdown-item" href="dashboard.php">Admin dashboard</a>
-                                    <?php endif; ?>
+                                    <hr class="dropdown-divider my-1">
                                 </li>
+
                                 <li>
-                                    <a class="dropdown-item text-danger" href="logout.php">Log out</a>
+                                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php">
+                                        <span class="user-dropdown-icon user-dropdown-icon-danger">
+                                            ⏻
+                                        </span>
+                                        <span>Log out</span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>

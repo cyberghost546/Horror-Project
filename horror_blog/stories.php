@@ -20,6 +20,11 @@ $categoryMap = [
     'abandoned' => 'Abandoned places',
     'psychological' => 'Psychological horror'
 ];
+$filter = $_GET['filter'] ?? '';
+
+if ($filter === 'featured') {
+$sql .= " AND is_featured = 1 ";
+}
 
 $where = 's.is_published = 1';
 
