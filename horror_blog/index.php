@@ -221,7 +221,7 @@ $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <div class="mb-3">
                             <h2 class="text-light mb-2">Featured on Silent Evidence</h2>
-                            <p class="text-secondary mb-3" style="max-width:420px;">
+                            <p class="text-secondary mb-3" style="max-width: 600px;">
                                 Highlighted by our community. A collection of stories chosen by the admins to appear on the homepage.
                             </p>
 
