@@ -50,19 +50,21 @@ function se_category_label(string $cat): string
 
 // Load featured stories
 $featuredStmt = $pdo->query("
-SELECT
-id,
-title,
-category,
-content,
-created_at
-FROM stories
-WHERE is_published = 1
-AND is_featured = 1
-ORDER BY created_at DESC
-LIMIT 3
+    SELECT
+        id,
+        title,
+        category,
+        content,
+        created_at,
+        image_path
+    FROM stories
+    WHERE is_published = 1
+      AND is_featured = 1
+    ORDER BY created_at DESC
+    LIMIT 3
 ");
 $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 
@@ -229,18 +231,27 @@ $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
 
                         <?php if (!empty($featuredStories[0])): ?>
-                            <a href="story.php?id=<?php echo (int)$featuredStories[0]['id']; ?>">
+                            <?php
+                            // use the same image the user set for the story
+                            $featured = $featuredStories[0];
+
+                            $featuredThumb = !empty($featured['image_path'])
+                                ? $featured['image_path']
+                                : 'assets/img/default_story.jpg';
+                            ?>
+                            <a href="story.php?id=<?php echo (int)$featured['id']; ?>">
                                 <img
-                                    src="<?php echo !empty($featuredStories[0]['image'])
-                                                ? htmlspecialchars($featuredStories[0]['image'])
-                                                : 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80'; ?>"
+                                    src="<?php echo htmlspecialchars($featuredThumb); ?>"
+                                    alt="<?php echo htmlspecialchars($featured['title']); ?>"
                                     class="rounded-4 shadow-lg"
-                                    style="width:260px;height:160px;object-fit:cover;border:1px solid #1f2937;">
+                                    style="width:500px;height:400px;object-fit:cover;border:1px solid #1f2937;">
                             </a>
                         <?php endif; ?>
                     </div>
                 </section>
             <?php endif; ?>
+
+
 
             <hr>
 

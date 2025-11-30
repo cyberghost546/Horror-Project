@@ -2,12 +2,10 @@
 session_start();
 require 'include/db.php';
 
-// defaults so you never get "undefined variable" warnings
 $filterLabel = 'All categories';
 $topByViews  = [];
 $topByLikes  = [];
 
-// optional category filter, same style as stories.php
 $categoryKey = $_GET['category'] ?? null;
 
 $categoryMap = [
@@ -29,10 +27,18 @@ if ($categoryKey && isset($categoryMap[$categoryKey])) {
     $filterLabel  = 'All categories';
 }
 
-// top by views
 $sqlViews = "
-    SELECT s.id, s.title, s.category, s.content, s.created_at, s.views, s.likes,
-           u.display_name, u.username
+    SELECT s.id,
+           s.title,
+           s.category,
+           s.content,
+           s.created_at,
+           s.views,
+           s.likes,
+           s.image,
+           u.display_name,
+           u.username,
+           u.avatar
       FROM stories s
       JOIN users u ON u.id = s.user_id
      WHERE $where
@@ -44,10 +50,18 @@ $stmt = $pdo->prepare($sqlViews);
 $stmt->execute($params);
 $topByViews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// top by likes
 $sqlLikes = "
-    SELECT s.id, s.title, s.category, s.content, s.created_at, s.views, s.likes,
-           u.display_name, u.username
+    SELECT s.id,
+           s.title,
+           s.category,
+           s.content,
+           s.created_at,
+           s.views,
+           s.likes,
+           s.image,
+           u.display_name,
+           u.username,
+           u.avatar
       FROM stories s
       JOIN users u ON u.id = s.user_id
      WHERE $where
@@ -65,7 +79,7 @@ $topByLikes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="utf-8">
     <title>Top stories | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -115,7 +129,6 @@ $topByLikes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <hr class="border-secondary mb-4">
 
-    <!-- Most viewed -->
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="section-title mb-0">Most viewed</h2>
@@ -132,22 +145,28 @@ $topByLikes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="col">
                         <a href="story.php?id=<?php echo (int)$story['id']; ?>" style="text-decoration:none;">
                             <div class="story-card h-100">
+
+                                <?php if (!empty($story['image'])): ?>
+                                    <div>
+                                        <img
+                                            src="<?php echo htmlspecialchars($story['image']); ?>"
+                                            alt="<?php echo htmlspecialchars($story['title']); ?>"
+                                            class="img-fluid"
+                                            style="width:100%;height:180px;object-fit:cover;border-radius:0.75rem 0.75rem 0 0;"
+                                        >
+                                    </div>
+                                <?php endif; ?>
+
                                 <div class="card-body">
 
                                     <div class="category-tag mb-1">
                                         <?php
                                         $cat = $story['category'];
-                                        if ($cat === 'true') {
-                                            echo 'TRUE STORY';
-                                        } elseif ($cat === 'paranormal') {
-                                            echo 'PARANORMAL';
-                                        } elseif ($cat === 'urban') {
-                                            echo 'URBAN LEGEND';
-                                        } elseif ($cat === 'short') {
-                                            echo 'SHORT NIGHTMARE';
-                                        } else {
-                                            echo htmlspecialchars($cat);
-                                        }
+                                        if ($cat === 'true') echo 'TRUE STORY';
+                                        elseif ($cat === 'paranormal') echo 'PARANORMAL';
+                                        elseif ($cat === 'urban') echo 'URBAN LEGEND';
+                                        elseif ($cat === 'short') echo 'SHORT NIGHTMARE';
+                                        else echo htmlspecialchars($cat);
                                         ?>
                                     </div>
 
@@ -182,7 +201,6 @@ $topByLikes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
     </section>
 
-    <!-- Most liked -->
     <section>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="section-title mb-0">Most liked</h2>
@@ -199,22 +217,28 @@ $topByLikes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="col">
                         <a href="story.php?id=<?php echo (int)$story['id']; ?>" style="text-decoration:none;">
                             <div class="story-card h-100">
+
+                                <?php if (!empty($story['image'])): ?>
+                                    <div>
+                                        <img
+                                            src="<?php echo htmlspecialchars($story['image']); ?>"
+                                            alt="<?php echo htmlspecialchars($story['title']); ?>"
+                                            class="img-fluid"
+                                            style="width:100%;height:180px;object-fit:cover;border-radius:0.75rem 0.75rem 0 0;"
+                                        >
+                                    </div>
+                                <?php endif; ?>
+
                                 <div class="card-body">
 
                                     <div class="category-tag mb-1">
                                         <?php
                                         $cat = $story['category'];
-                                        if ($cat === 'true') {
-                                            echo 'TRUE STORY';
-                                        } elseif ($cat === 'paranormal') {
-                                            echo 'PARANORMAL';
-                                        } elseif ($cat === 'urban') {
-                                            echo 'URBAN LEGEND';
-                                        } elseif ($cat === 'short') {
-                                            echo 'SHORT NIGHTMARE';
-                                        } else {
-                                            echo htmlspecialchars($cat);
-                                        }
+                                        if ($cat === 'true') echo 'TRUE STORY';
+                                        elseif ($cat === 'paranormal') echo 'PARANORMAL';
+                                        elseif ($cat === 'urban') echo 'URBAN LEGEND';
+                                        elseif ($cat === 'short') echo 'SHORT NIGHTMARE';
+                                        else echo htmlspecialchars($cat);
                                         ?>
                                     </div>
 

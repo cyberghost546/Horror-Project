@@ -1,13 +1,18 @@
-<?php session_start();
+<?php
+session_start();
 require 'include/db.php';
+
 if (empty($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: index.php');
     exit;
 }
+
 $success = '';
-// handle forms only on POST 
+
+// handle forms only on POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // quick story promotion from dashboard (feature / unfeature) 
+
+    // quick story promotion from dashboard (feature / unfeature)
     if (isset($_POST['action'], $_POST['story_id']) && $_POST['action'] === 'toggle_featured') {
         $storyId = (int) $_POST['story_id'];
         if ($storyId > 0) {
@@ -15,74 +20,129 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([':id' => $storyId]);
             $success = 'Story featured status updated';
         }
-        // slideshow form (has slides[]) 
+
+        // slideshow form (has slides[])
     } elseif (isset($_POST['slides'])) {
+
         foreach ($_POST['slides'] as $id => $data) {
-            $id = (int)$id;
-            $title = trim($data['title'] ?? '');
+            $id      = (int)$id;
+            $title   = trim($data['title'] ?? '');
             $caption = trim($data['caption'] ?? '');
-            $order = (int)($data['sort_order'] ?? 0);
-            $active = isset($data['is_active']) ? 1 : 0;
-            // default to existing image from hidden field 
+            $order   = (int)($data['sort_order'] ?? 0);
+            $active  = isset($data['is_active']) ? 1 : 0;
+
+            // default to existing image from hidden field
             $imagePath = trim($data['current_image'] ?? '');
-            // check if a new file was uploaded for this slide 
+
+            // check if a new file was uploaded for this slide
             if (!empty($_FILES['slides_files']['name'][$id])) {
-                $fileTmp = $_FILES['slides_files']['tmp_name'][$id];
+                $fileTmp  = $_FILES['slides_files']['tmp_name'][$id];
                 $fileName = basename($_FILES['slides_files']['name'][$id]);
-                // basic extension check 
-                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                $ext     = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                 $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
                 if (in_array($ext, $allowed)) {
                     $uploadDir = 'uploads/slides/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
+
                     $target = $uploadDir . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $fileName);
                     if (move_uploaded_file($fileTmp, $target)) {
                         $imagePath = $target;
                     }
                 }
             }
+
             if ($id > 0 && $title !== '' && $imagePath !== '') {
-                $stmt = $pdo->prepare(" UPDATE carousel_slides SET title = :t, caption = :c, image_url = :i, sort_order = :o, is_active = :a WHERE id = :id ");
-                $stmt->execute([':t' => $title, ':c' => $caption, ':i' => $imagePath, ':o' => $order, ':a' => $active, ':id' => $id,]);
+                $stmt = $pdo->prepare(
+                    'UPDATE carousel_slides
+                        SET title      = :t,
+                            caption    = :c,
+                            image_url  = :i,
+                            sort_order = :o,
+                            is_active  = :a
+                      WHERE id = :id'
+                );
+                $stmt->execute([
+                    ':t'  => $title,
+                    ':c'  => $caption,
+                    ':i'  => $imagePath,
+                    ':o'  => $order,
+                    ':a'  => $active,
+                    ':id' => $id,
+                ]);
             }
         }
+
         $success = 'Carousel updated';
-        // homepage settings form 
+
+        // homepage settings form
     } else {
-        $show_latest = isset($_POST['show_latest']) ? 1 : 0;
-        $show_popular = isset($_POST['show_popular']) ? 1 : 0;
+        $show_latest   = isset($_POST['show_latest']) ? 1 : 0;
+        $show_popular  = isset($_POST['show_popular']) ? 1 : 0;
         $show_featured = isset($_POST['show_featured']) ? 1 : 0;
-        $stmt = $pdo->prepare('UPDATE homepage_settings SET show_latest = :sl, show_popular = :sp, show_featured = :sf WHERE id = 1');
-        $stmt->execute([':sl' => $show_latest, ':sp' => $show_popular, ':sf' => $show_featured,]);
+
+        $stmt = $pdo->prepare(
+            'UPDATE homepage_settings
+                SET show_latest   = :sl,
+                    show_popular  = :sp,
+                    show_featured = :sf
+              WHERE id = 1'
+        );
+        $stmt->execute([
+            ':sl' => $show_latest,
+            ':sp' => $show_popular,
+            ':sf' => $show_featured,
+        ]);
+
         $success = 'Homepage sections updated';
     }
 }
-// fetch homepage settings 
-$stmt = $pdo->query('SELECT * FROM homepage_settings WHERE id = 1 LIMIT 1');
+
+// fetch homepage settings
+$stmt     = $pdo->query('SELECT * FROM homepage_settings WHERE id = 1 LIMIT 1');
 $settings = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// fallback if table is empty 
+// fallback if table is empty
 if (!$settings) {
-    $settings = ['show_latest' => 1, 'show_popular' => 1, 'show_featured' => 1,];
+    $settings = [
+        'show_latest'   => 1,
+        'show_popular'  => 1,
+        'show_featured' => 1,
+    ];
 }
 
-// fetch slides for dashboard form 
-$slidesAdminStmt = $pdo->query(" SELECT id, title, caption, image_url, sort_order, is_active FROM carousel_slides ORDER BY sort_order, id ");
+// fetch slides for dashboard form
+$slidesAdminStmt = $pdo->query(
+    'SELECT id, title, caption, image_url, sort_order, is_active
+       FROM carousel_slides
+   ORDER BY sort_order, id'
+);
 $slidesAdmin = $slidesAdminStmt->fetchAll();
 
-// quick stats 
-$totalUsers = $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
-$totalStories = $pdo->query('SELECT COUNT(*) FROM stories')->fetchColumn();
+// quick stats
+$totalUsers    = $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+$totalStories  = $pdo->query('SELECT COUNT(*) FROM stories')->fetchColumn();
 $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1')->fetchColumn();
 
-// recent stories for quick promotion widget 
-$recentStoriesStmt = $pdo->query(" SELECT id, title, is_published, is_featured, created_at, views, likes FROM stories ORDER BY created_at DESC LIMIT 6 ");
+// recent stories for quick promotion widget, include image
+$recentStoriesStmt = $pdo->query(
+    'SELECT id, title, is_published, is_featured, created_at, views, likes, image_path
+       FROM stories
+   ORDER BY created_at DESC
+      LIMIT 6'
+);
 $recentStories = $recentStoriesStmt->fetchAll();
 
-// top 5 popular stories by views 
-$stmt = $pdo->query('SELECT title, views, likes, created_at FROM stories ORDER BY views DESC LIMIT 5');
+// top 5 popular stories by views, include image
+$stmt = $pdo->query(
+    'SELECT title, views, likes, created_at, image_path
+       FROM stories
+   ORDER BY views DESC
+      LIMIT 5'
+);
 $popularStories = $stmt->fetchAll();
 
 ?>
@@ -94,7 +154,10 @@ $popularStories = $stmt->fetchAll();
     <title>Dashboard silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
     <style>
         body {
             background-color: #020617;
@@ -218,366 +281,394 @@ $popularStories = $stmt->fetchAll();
 </head>
 
 <body>
-    <?php include 'include/header.php'; ?>
+<?php include 'include/header.php'; ?>
 
-    <div class="layout-wrapper">
-        <!-- sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-title">Company name</div>
-            <a href="dashboard.php" class="side-link active">
-                <span class="icon">🏠</span>
-                <span>Dashboard</span>
+<div class="layout-wrapper">
+    <!-- sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-title">Company name</div>
+        <a href="dashboard.php" class="side-link active">
+            <span class="icon">🏠</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="stories_list.php" class="side-link">
+            <span class="icon">📖</span>
+            <span>Stories</span>
+        </a>
+        <a href="users_list.php" class="side-link">
+            <span class="icon">👥</span>
+            <span>Users</span>
+        </a>
+        <a href="contact_requests.php" class="side-link">
+            <span class="icon">📨</span>
+            <span>Contact requests</span>
+        </a>
+
+        <div class="nav-section-label">Saved views</div>
+        <a href="dashboard.php?range=month" class="side-link">
+            <span class="icon">🗓️</span>
+            <span>Current month</span>
+        </a>
+        <a href="dashboard.php?range=week" class="side-link">
+            <span class="icon">📈</span>
+            <span>Last week</span>
+        </a>
+
+        <div style="margin-top:auto">
+            <div class="nav-section-label">Account</div>
+            <a href="profile.php" class="side-link">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
             </a>
-            <a href="stories_list.php" class="side-link">
-                <span class="icon">📖</span>
-                <span>Stories</span>
+            <a href="logout.php" class="side-link">
+                <span class="icon">⏻</span>
+                <span>Sign out</span>
             </a>
-            <a href="users_list.php" class="side-link">
-                <span class="icon">👥</span>
-                <span>Users</span>
-            </a>
+        </div>
+    </aside>
 
-            <div class="nav-section-label">Saved views</div>
-            <a href="dashboard.php?range=month" class="side-link">
-                <span class="icon">🗓️</span>
-                <span>Current month</span>
-            </a>
-            <a href="dashboard.php?range=week" class="side-link">
-                <span class="icon">📈</span>
-                <span>Last week</span>
-            </a>
-
-            <div style="margin-top:auto">
-                <div class="nav-section-label">Account</div>
-                <a href="profile.php" class="side-link">
-                    <span class="icon">⚙️</span>
-                    <span>Settings</span>
-                </a>
-                <a href="logout.php" class="side-link">
-                    <span class="icon">⏻</span>
-                    <span>Sign out</span>
-                </a>
-            </div>
-        </aside>
-
-        <!-- main -->
-        <div class="main-area">
-            <div class="main-header d-flex justify-content-between align-items-center">
-                <h1 class="page-title mb-0">Dashboard</h1>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-silent">Share</button>
-                    <button class="btn btn-outline-silent">Export</button>
-                    <button class="btn btn-outline-silent">This week</button>
-                </div>
-            </div>
-
-            <div class="main-content">
-                <?php if ($success): ?>
-                    <div class="alert alert-success py-2 small">
-                        <?php echo htmlspecialchars($success); ?>
-                    </div>
-                <?php endif; ?>
-
-                <!-- stats row -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header">Total users</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number">
-                                    <?php echo (int)$totalUsers; ?>
-                                </div>
-                                <div class="text-muted small">Registered accounts</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header">Total stories</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number">
-                                    <?php echo (int)$totalStories; ?>
-                                </div>
-                                <div class="text-muted small">All published stories</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header">Featured stories</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number">
-                                    <?php echo (int)$totalFeatured; ?>
-                                </div>
-                                <div class="text-muted small">Shown as highlights</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    <!-- left column: popular stories -->
-                    <div class="col-lg-7">
-                        <div class="card-dark h-100">
-                            <div class="card-dark-header d-flex justify-content-between align-items-center">
-                                <span>Top popular stories</span>
-                                <a href="stories_list.php" class="btn btn-outline-silent">Manage stories</a>
-                            </div>
-                            <div class="card-dark-body">
-                                <?php if (!$popularStories): ?>
-                                    <p class="small text-muted mb-0">No stories yet</p>
-                                <?php else: ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Views</th>
-                                                    <th>Likes</th>
-                                                    <th>Created</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($popularStories as $story): ?>
-                                                    <tr>
-                                                        <td><?php echo htmlspecialchars($story['title']); ?></td>
-                                                        <td><?php echo (int)$story['views']; ?></td>
-                                                        <td><?php echo (int)$story['likes']; ?></td>
-                                                        <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- right column -->
-                    <!-- right column -->
-                    <div class="col-lg-5">
-
-                        <!-- NEW: quick story promotion -->
-                        <div class="card-dark mb-3">
-                            <div class="card-dark-header d-flex justify-content-between align-items-center">
-                                <span>Promote stories</span>
-                                <a href="stories_list.php" class="btn btn-outline-silent btn-sm">
-                                    Open stories list
-                                </a>
-                            </div>
-                            <div class="card-dark-body">
-                                <?php if (!$recentStories): ?>
-                                    <p class="small text-muted mb-0">
-                                        No stories yet. Publish a story first to promote it.
-                                    </p>
-                                <?php else: ?>
-                                    <p class="small text-muted">
-                                        Choose which stories should appear in the featured block on the homepage.
-                                    </p>
-
-                                    <div class="table-responsive">
-                                        <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
-                                            <thead>
-                                                <tr>
-                                                    <th class="small">Story</th>
-                                                    <th class="small text-center">Status</th>
-                                                    <th class="small text-end">Feature</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($recentStories as $s): ?>
-                                                    <tr>
-                                                        <td>
-                                                            <span class="d-block fw-semibold small">
-                                                                <?php echo htmlspecialchars($s['title']); ?>
-                                                            </span>
-                                                            <span class="text-muted small">
-                                                                ID #<?php echo (int)$s['id']; ?>
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <?php if ($s['is_published']): ?>
-                                                                <span class="badge bg-success text-dark">Published</span>
-                                                            <?php else: ?>
-                                                                <span class="badge bg-secondary">Draft</span>
-                                                            <?php endif; ?>
-
-                                                            <?php if ($s['is_featured']): ?>
-                                                                <span class="badge bg-warning text-dark ms-1">Featured</span>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <form method="post" class="d-inline">
-                                                                <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
-                                                                <input type="hidden" name="action" value="toggle_featured">
-                                                                <button
-                                                                    type="submit"
-                                                                    class="btn btn-outline-silent btn-sm">
-                                                                    <?php echo $s['is_featured'] ? 'Remove' : 'Feature'; ?>
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- homepage sections -->
-                        <div class="card-dark mb-3">
-                            <div class="card-dark-header">Homepage sections</div>
-                            <div class="card-dark-body">
-                                <p class="small text-muted">
-                                    Turn sections on or off. Your home page will follow these settings.
-                                </p>
-
-                                <form method="post">
-                                    <div class="form-check form-switch mb-2">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_latest"
-                                            name="show_latest"
-                                            <?php if ($settings['show_latest']) echo 'checked'; ?>>
-                                        <label class="form-check-label" for="show_latest">
-                                            Show "Latest stories"
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-switch mb-2">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_popular"
-                                            name="show_popular"
-                                            <?php if ($settings['show_popular']) echo 'checked'; ?>>
-                                        <label class="form-check-label" for="show_popular">
-                                            Show "Popular stories"
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-switch mb-3">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_featured"
-                                            name="show_featured"
-                                            <?php if ($settings['show_featured']) echo 'checked'; ?>>
-                                        <label class="form-check-label" for="show_featured">
-                                            Show "Featured stories" section
-                                        </label>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-outline-silent">
-                                        Save settings
-                                    </button>
-                                </form>
-
-                                <p class="small text-muted mt-3 mb-0">
-                                    Use is_featured on a story to decide which ones appear in the featured block.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- slideshow settings -->
-                        <div class="card-dark">
-                            <div class="card-dark-header">
-                                Homepage slideshow
-                            </div>
-                            <div class="card-dark-body">
-                                <p class="small text-muted">
-                                    Update the images, titles and order of the hero slideshow on the homepage.
-                                </p>
-
-                                <form method="post" enctype="multipart/form-data">
-                                    <?php foreach ($slidesAdmin as $slide): ?>
-                                        <div class="border rounded-3 p-3 mb-3" style="border-color:#1f2937;">
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Title</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    name="slides[<?php echo $slide['id']; ?>][title]"
-                                                    value="<?php echo htmlspecialchars($slide['title']); ?>">
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Caption</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    name="slides[<?php echo $slide['id']; ?>][caption]"
-                                                    value="<?php echo htmlspecialchars($slide['caption']); ?>">
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Image</label>
-                                                <input
-                                                    type="file"
-                                                    class="form-control form-control-sm"
-                                                    name="slides_files[<?php echo $slide['id']; ?>]"
-                                                    accept="image/*">
-
-                                                <input
-                                                    type="hidden"
-                                                    name="slides[<?php echo $slide['id']; ?>][current_image]"
-                                                    value="<?php echo htmlspecialchars($slide['image_url']); ?>">
-
-                                                <?php if (!empty($slide['image_url'])): ?>
-                                                    <div class="small text-muted mt-1">
-                                                        Current: <?php echo htmlspecialchars($slide['image_url']); ?>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <div class="row g-2 align-items-center">
-                                                <div class="col-4">
-                                                    <label class="form-label small">Order</label>
-                                                    <input
-                                                        type="number"
-                                                        class="form-control form-control-sm"
-                                                        name="slides[<?php echo $slide['id']; ?>][sort_order]"
-                                                        value="<?php echo (int)$slide['sort_order']; ?>">
-                                                </div>
-                                                <div class="col-4 form-check mt-4">
-                                                    <input
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        id="slide_active_<?php echo $slide['id']; ?>"
-                                                        name="slides[<?php echo $slide['id']; ?>][is_active]"
-                                                        <?php if ($slide['is_active']) echo 'checked'; ?>>
-                                                    <label class="form-check-label small" for="slide_active_<?php echo $slide['id']; ?>">
-                                                        Active
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-
-                                    <button type="submit" class="btn btn-outline-silent">
-                                        Save slideshow
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                    </div> <!-- /right column -->
-
-
-                </div>
-
+    <!-- main -->
+    <div class="main-area">
+        <div class="main-header d-flex justify-content-between align-items-center">
+            <h1 class="page-title mb-0">Dashboard</h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-silent">Share</button>
+                <button class="btn btn-outline-silent">Export</button>
+                <button class="btn btn-outline-silent">This week</button>
             </div>
         </div>
+
+        <div class="main-content">
+            <?php if ($success): ?>
+                <div class="alert alert-success py-2 small">
+                    <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- stats row -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card-dark">
+                        <div class="card-dark-header">Total users</div>
+                        <div class="card-dark-body">
+                            <div class="stat-number">
+                                <?php echo (int)$totalUsers; ?>
+                            </div>
+                            <div class="text-muted small">Registered accounts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-dark">
+                        <div class="card-dark-header">Total stories</div>
+                        <div class="card-dark-body">
+                            <div class="stat-number">
+                                <?php echo (int)$totalStories; ?>
+                            </div>
+                            <div class="text-muted small">All stories</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-dark">
+                        <div class="card-dark-header">Featured stories</div>
+                        <div class="card-dark-body">
+                            <div class="stat-number">
+                                <?php echo (int)$totalFeatured; ?>
+                            </div>
+                            <div class="text-muted small">Shown as highlights</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- left column: popular stories -->
+                <div class="col-lg-7">
+                    <div class="card-dark h-100">
+                        <div class="card-dark-header d-flex justify-content-between align-items-center">
+                            <span>Top popular stories</span>
+                            <a href="stories_list.php" class="btn btn-outline-silent">Manage stories</a>
+                        </div>
+                        <div class="card-dark-body">
+                            <?php if (!$popularStories): ?>
+                                <p class="small text-muted mb-0">No stories yet</p>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Thumbnail</th>
+                                                <th>Title</th>
+                                                <th>Views</th>
+                                                <th>Likes</th>
+                                                <th>Created</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($popularStories as $story): ?>
+                                                <?php
+                                                $thumb = !empty($story['image_path'])
+                                                    ? $story['image_path']
+                                                    : 'assets/img/default_story.jpg';
+                                                ?>
+                                                <tr>
+                                                    <td>
+                                                        <img
+                                                            src="<?php echo htmlspecialchars($thumb); ?>"
+                                                            alt="Story image"
+                                                            style="width:60px;height:40px;object-fit:cover;border-radius:0.5rem;border:1px solid #374151;"
+                                                        >
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($story['title']); ?></td>
+                                                    <td><?php echo (int)$story['views']; ?></td>
+                                                    <td><?php echo (int)$story['likes']; ?></td>
+                                                    <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- right column -->
+                <div class="col-lg-5">
+
+                    <!-- quick story promotion -->
+                    <div class="card-dark mb-3">
+                        <div class="card-dark-header d-flex justify-content-between align-items-center">
+                            <span>Promote stories</span>
+                            <a href="stories_list.php" class="btn btn-outline-silent btn-sm">
+                                Open stories list
+                            </a>
+                        </div>
+                        <div class="card-dark-body">
+                            <?php if (!$recentStories): ?>
+                                <p class="small text-muted mb-0">
+                                    No stories yet. Publish a story first to promote it.
+                                </p>
+                            <?php else: ?>
+                                <p class="small text-muted">
+                                    Choose which stories should appear in the featured block on the homepage.
+                                </p>
+
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
+                                        <thead>
+                                            <tr>
+                                                <th class="small">Story</th>
+                                                <th class="small text-center">Status</th>
+                                                <th class="small text-end">Feature</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($recentStories as $s): ?>
+                                                <?php
+                                                $thumb = !empty($s['image_path'])
+                                                    ? $s['image_path']
+                                                    : 'assets/img/default_story.jpg';
+                                                ?>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <img
+                                                                src="<?php echo htmlspecialchars($thumb); ?>"
+                                                                alt="Story image"
+                                                                style="width:48px;height:32px;object-fit:cover;border-radius:0.5rem;border:1px solid #374151;"
+                                                            >
+                                                            <div>
+                                                                <span class="d-block fw-semibold small">
+                                                                    <?php echo htmlspecialchars($s['title']); ?>
+                                                                </span>
+                                                                <span class="text-muted small">
+                                                                    ID #<?php echo (int)$s['id']; ?>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <?php if ($s['is_published']): ?>
+                                                            <span class="badge bg-success text-dark">Published</span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-secondary">Draft</span>
+                                                        <?php endif; ?>
+
+                                                        <?php if ($s['is_featured']): ?>
+                                                            <span class="badge bg-warning text-dark ms-1">Featured</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form method="post" class="d-inline">
+                                                            <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
+                                                            <input type="hidden" name="action" value="toggle_featured">
+                                                            <button
+                                                                type="submit"
+                                                                class="btn btn-outline-silent btn-sm">
+                                                                <?php echo $s['is_featured'] ? 'Remove' : 'Feature'; ?>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- homepage sections -->
+                    <div class="card-dark mb-3">
+                        <div class="card-dark-header">Homepage sections</div>
+                        <div class="card-dark-body">
+                            <p class="small text-muted">
+                                Turn sections on or off. Your home page will follow these settings.
+                            </p>
+
+                            <form method="post">
+                                <div class="form-check form-switch mb-2">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="show_latest"
+                                        name="show_latest"
+                                        <?php if ($settings['show_latest']) echo 'checked'; ?>>
+                                    <label class="form-check-label" for="show_latest">
+                                        Show "Latest stories"
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-switch mb-2">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="show_popular"
+                                        name="show_popular"
+                                        <?php if ($settings['show_popular']) echo 'checked'; ?>>
+                                    <label class="form-check-label" for="show_popular">
+                                        Show "Popular stories"
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="show_featured"
+                                        name="show_featured"
+                                        <?php if ($settings['show_featured']) echo 'checked'; ?>>
+                                    <label class="form-check-label" for="show_featured">
+                                        Show "Featured stories" section
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-outline-silent">
+                                    Save settings
+                                </button>
+                            </form>
+
+                            <p class="small text-muted mt-3 mb-0">
+                                Use is_featured on a story to decide which ones appear in the featured block.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- slideshow settings -->
+                    <div class="card-dark">
+                        <div class="card-dark-header">
+                            Homepage slideshow
+                        </div>
+                        <div class="card-dark-body">
+                            <p class="small text-muted">
+                                Update the images, titles and order of the hero slideshow on the homepage.
+                            </p>
+
+                            <form method="post" enctype="multipart/form-data">
+                                <?php foreach ($slidesAdmin as $slide): ?>
+                                    <div class="border rounded-3 p-3 mb-3" style="border-color:#1f2937;">
+
+                                        <div class="mb-2">
+                                            <label class="form-label small">Title</label>
+                                            <input
+                                                type="text"
+                                                class="form-control form-control-sm"
+                                                name="slides[<?php echo $slide['id']; ?>][title]"
+                                                value="<?php echo htmlspecialchars($slide['title']); ?>">
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label small">Caption</label>
+                                            <input
+                                                type="text"
+                                                class="form-control form-control-sm"
+                                                name="slides[<?php echo $slide['id']; ?>][caption]"
+                                                value="<?php echo htmlspecialchars($slide['caption']); ?>">
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label small">Image</label>
+                                            <input
+                                                type="file"
+                                                class="form-control form-control-sm"
+                                                name="slides_files[<?php echo $slide['id']; ?>]"
+                                                accept="image/*">
+
+                                            <input
+                                                type="hidden"
+                                                name="slides[<?php echo $slide['id']; ?>][current_image]"
+                                                value="<?php echo htmlspecialchars($slide['image_url']); ?>">
+
+                                            <?php if (!empty($slide['image_url'])): ?>
+                                                <div class="small text-muted mt-1">
+                                                    Current: <?php echo htmlspecialchars($slide['image_url']); ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-4">
+                                                <label class="form-label small">Order</label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control form-control-sm"
+                                                    name="slides[<?php echo $slide['id']; ?>][sort_order]"
+                                                    value="<?php echo (int)$slide['sort_order']; ?>">
+                                            </div>
+                                            <div class="col-4 form-check mt-4">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="slide_active_<?php echo $slide['id']; ?>"
+                                                    name="slides[<?php echo $slide['id']; ?>][is_active]"
+                                                    <?php if ($slide['is_active']) echo 'checked'; ?>>
+                                                <label class="form-check-label small" for="slide_active_<?php echo $slide['id']; ?>">
+                                                    Active
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+
+                                <button type="submit" class="btn btn-outline-silent">
+                                    Save slideshow
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div> <!-- /right column -->
+
+            </div>
+
+        </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
