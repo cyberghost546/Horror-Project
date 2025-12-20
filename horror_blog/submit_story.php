@@ -130,7 +130,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Submit story | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 18px;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-body {
+            padding: 18px 16px 18px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #020617;
+            border-color: #1f2937;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: none;
+        }
+
+        .form-control::placeholder {
+            color: #6b7280;
+        }
+
+        textarea.form-control {
+            min-height: 220px;
+            resize: vertical;
+        }
+
+        .btn-primary-silent {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #0b1120;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.4rem;
+        }
+
+        .btn-primary-silent:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            color: #0b1120;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .small-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+    </style>
 </head>
 
 <body>
@@ -163,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php $currentCat = $_POST['category'] ?? 'true'; ?>
                 <form method="post" enctype="multipart/form-data" novalidate>
                     <div class="mb-3">
-                        <label class="form-label">Title</label>
+                        <label class="form-label text-white fw-bold">Title</label>
                         <input
                             type="text"
                             name="title"
@@ -177,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Category</label>
+                        <label class="form-label text-white fw-bold">Category</label>
                         <select name="category" class="form-select">
                             <option value="true" <?php echo $currentCat === 'true' ? 'selected' : ''; ?>>True story</option>
                             <option value="paranormal" <?php echo $currentCat === 'paranormal' ? 'selected' : ''; ?>>Paranormal</option>
@@ -197,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Your story</label>
+                        <label class="form-label text-white fw-bold">Your story</label>
                         <textarea
                             name="content"
                             class="form-control"
@@ -209,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Story image</label>
+                        <label class="form-label text-white fw-bold">Story image</label>
                         <input
                             type="file"
                             name="story_image"
@@ -229,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 id="publish"
                                 name="publish"
                                 <?php echo isset($_POST['publish']) ? 'checked' : 'checked'; ?>>
-                            <label class="form-check-label" for="publish">
+                            <label class="form-check-label text-white" for="publish">
                                 Publish immediately
                             </label>
                         </div>

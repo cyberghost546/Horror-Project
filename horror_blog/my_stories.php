@@ -36,13 +36,139 @@ $stories = $stmt->fetchAll(); ?>
     <meta charset="utf-8">
     <title>My stories | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 2000px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-body {
+            padding: 16px;
+        }
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        .table-dark-custom thead {
+            color: #9ca3af;
+        }
+
+        .table-dark-custom tbody td {
+            border-color: #111827;
+        }
+
+        .badge-cat {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .badge-cat-true {
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+
+        .badge-cat-paranormal {
+            background-color: #22c55e;
+            color: #022c22;
+        }
+
+        .badge-cat-urban {
+            background-color: #eab308;
+            color: #1f2937;
+        }
+
+        .badge-cat-short {
+            background-color: #f97316;
+            color: #1f2937;
+        }
+
+        .badge-status {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            padding: 3px 9px;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 10px 10px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .action-form button {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+        }
+    </style>
 
 </head>
 
-<body> <?php include 'include/header.php'; ?> <div class="page-wrapper">
+<body>
+    <?php include 'include/header.php'; ?>
+    <div class="page-wrapper">
         <div class="page-header">
             <div>
                 <h1 class="page-title">My stories</h1>
@@ -62,7 +188,7 @@ $stories = $stmt->fetchAll(); ?>
         <div class="card card-dark">
             <div class="card-dark-header d-flex justify-content-between align-items-center">
                 <span>Your stories</span>
-                <span class="small text-muted">
+                <span class="text-white fw-bold">
                     Total: <?php echo count($stories); ?>
                 </span>
             </div>
@@ -118,7 +244,7 @@ $stories = $stmt->fetchAll(); ?>
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="small text-muted">
+                                            <span class="text-white">
                                                 👁 <?php echo (int)$s['views']; ?>
                                                 · ❤ <?php echo (int)$s['likes']; ?>
                                             </span>

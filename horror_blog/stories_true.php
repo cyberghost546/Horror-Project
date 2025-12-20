@@ -19,8 +19,33 @@ $stories = $stmt->fetchAll();
 <head>
 <meta charset='utf-8'>
 <title>True Horror Stories | silent_evidence</title>
-<link rel="stylesheet" href="css/style.css">
 <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
+
+<style>
+body {
+    background:#020617;
+    color:#e5e7eb;
+    font-family:system-ui;
+}
+.story-card {
+    background:#0b1120;
+    border:1px solid #1e293b;
+    border-radius:18px;
+    padding:18px;
+    transition:0.2s;
+    cursor:pointer;
+}
+.story-card:hover {
+    border-color:#f60000;
+    transform:translateY(-3px);
+}
+.story-tag {
+    font-size:11px;
+    color:#f87171;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+}
+</style>
 </head>
 
 <body>

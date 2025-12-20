@@ -66,14 +66,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <title>Sign Up | Silent Evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <style>
+        body {
+            background-color: #020617;
+            font-family: system-ui, sans-serif;
+            
+        }
+
+        .card-modern {
+            width: 100%;
+            max-width: 430px;
+            margin: auto;
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 0 1000px rgba(246, 0, 0, 0.25);
+        }
+
+        .card-modern h2 {
+            color: #f60000;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .label-text {
+            font-size: 0.85rem;
+            color: #eaeaeaff;
+        }
+
+        .form-control {
+            background-color: #1e293b;
+            border-color: #334155;
+             color: #ffffff !important;
+        }
+
+
+        .form-control:focus {
+            background-color: #1e293b;
+            border-color: #f60000;
+            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+        }
+
+        .btn-red {
+            background-color: #f60000;
+            color: #0f172a;
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .btn-red:hover {
+            background-color: #ca0000;
+        }
+
+        .divider {
+            text-align: center;
+            color: #64748b;
+            margin: 18px 0;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            background-color: #0f172a;
+        }
+
+        .google-btn {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 999px;
+        }
+
+        .google-btn:hover {
+            background-color: #293548;
+        }
+
+        .small-text {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 12px;
+        }
+
+        .small-text a {
+            color: #f60000;
+            text-decoration: none;
+        }
+
+        .small-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
-    <?php include 'include/header.php'; ?>
-    
     <div class="mt-5 pt-4">
         <div class="card-modern">
 

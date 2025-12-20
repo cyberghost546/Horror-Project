@@ -142,8 +142,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <title>Edit story | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border-radius: 16px;
+            border: 1px solid #111827;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-body {
+            padding: 18px 16px 18px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #020617;
+            border-color: #1f2937;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: none;
+        }
+
+        .btn-primary-silent {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #0b1120;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.4rem;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .story-thumb-preview {
+            max-width: 200px;
+            border-radius: 12px;
+            border: 1px solid #111827;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>

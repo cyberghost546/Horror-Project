@@ -9,20 +9,11 @@ if (empty($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['
 
 $success = '';
 
-// handle forms only on POST
+// handle forms
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // quick story promotion from dashboard (feature / unfeature)
-    if (isset($_POST['action'], $_POST['story_id']) && $_POST['action'] === 'toggle_featured') {
-        $storyId = (int) $_POST['story_id'];
-        if ($storyId > 0) {
-            $stmt = $pdo->prepare('UPDATE stories SET is_featured = 1 - is_featured WHERE id = :id');
-            $stmt->execute([':id' => $storyId]);
-            $success = 'Story featured status updated';
-        }
-
-        // slideshow form (has slides[])
-    } elseif (isset($_POST['slides'])) {
+    // slideshow form (has slides[])
+    if (isset($_POST['slides'])) {
 
         foreach ($_POST['slides'] as $id => $data) {
             $id      = (int)$id;
@@ -39,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fileTmp  = $_FILES['slides_files']['tmp_name'][$id];
                 $fileName = basename($_FILES['slides_files']['name'][$id]);
 
+                // basic extension check
                 $ext     = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                 $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
@@ -49,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     $target = $uploadDir . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $fileName);
+
                     if (move_uploaded_file($fileTmp, $target)) {
                         $imagePath = $target;
                     }
@@ -56,15 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($id > 0 && $title !== '' && $imagePath !== '') {
-                $stmt = $pdo->prepare(
-                    'UPDATE carousel_slides
-                        SET title      = :t,
-                            caption    = :c,
-                            image_url  = :i,
-                            sort_order = :o,
-                            is_active  = :a
-                      WHERE id = :id'
-                );
+                $stmt = $pdo->prepare("
+                    UPDATE carousel_slides
+                       SET title      = :t,
+                           caption    = :c,
+                           image_url  = :i,
+                           sort_order = :o,
+                           is_active  = :a
+                     WHERE id = :id
+                ");
                 $stmt->execute([
                     ':t'  => $title,
                     ':c'  => $caption,
@@ -78,10 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $success = 'Carousel updated';
 
-        // homepage settings form
     } else {
-        $show_latest   = isset($_POST['show_latest']) ? 1 : 0;
-        $show_popular  = isset($_POST['show_popular']) ? 1 : 0;
+        // homepage settings form
+        $show_latest   = isset($_POST['show_latest'])   ? 1 : 0;
+        $show_popular  = isset($_POST['show_popular'])  ? 1 : 0;
         $show_featured = isset($_POST['show_featured']) ? 1 : 0;
 
         $stmt = $pdo->prepare(
@@ -97,12 +90,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':sf' => $show_featured,
         ]);
 
-        $success = 'Homepage sections updated';
+        $success = 'Homepage settings updated';
     }
 }
 
 // fetch homepage settings
-$stmt     = $pdo->query('SELECT * FROM homepage_settings WHERE id = 1 LIMIT 1');
+$stmt = $pdo->query('SELECT * FROM homepage_settings WHERE id = 1 LIMIT 1');
 $settings = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // fallback if table is empty
@@ -115,11 +108,11 @@ if (!$settings) {
 }
 
 // fetch slides for dashboard form
-$slidesAdminStmt = $pdo->query(
-    'SELECT id, title, caption, image_url, sort_order, is_active
-       FROM carousel_slides
-   ORDER BY sort_order, id'
-);
+$slidesAdminStmt = $pdo->query("
+    SELECT id, title, caption, image_url, sort_order, is_active
+    FROM carousel_slides
+    ORDER BY sort_order, id
+");
 $slidesAdmin = $slidesAdminStmt->fetchAll();
 
 // quick stats
@@ -127,24 +120,9 @@ $totalUsers    = $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
 $totalStories  = $pdo->query('SELECT COUNT(*) FROM stories')->fetchColumn();
 $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1')->fetchColumn();
 
-// recent stories for quick promotion widget, include image
-$recentStoriesStmt = $pdo->query(
-    'SELECT id, title, is_published, is_featured, created_at, views, likes, image_path
-       FROM stories
-   ORDER BY created_at DESC
-      LIMIT 6'
-);
-$recentStories = $recentStoriesStmt->fetchAll();
-
-// top 5 popular stories by views, include image
-$stmt = $pdo->query(
-    'SELECT title, views, likes, created_at, image_path
-       FROM stories
-   ORDER BY views DESC
-      LIMIT 5'
-);
+// top 5 popular stories by views
+$stmt = $pdo->query('SELECT title, views, likes, created_at FROM stories ORDER BY views DESC LIMIT 5');
 $popularStories = $stmt->fetchAll();
-
 ?>
 <!doctype html>
 <html lang="en">
@@ -153,11 +131,7 @@ $popularStories = $stmt->fetchAll();
     <meta charset="utf-8">
     <title>Dashboard silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #020617;
@@ -299,10 +273,6 @@ $popularStories = $stmt->fetchAll();
             <span class="icon">👥</span>
             <span>Users</span>
         </a>
-        <a href="contact_requests.php" class="side-link">
-            <span class="icon">📨</span>
-            <span>Contact requests</span>
-        </a>
 
         <div class="nav-section-label">Saved views</div>
         <a href="dashboard.php?range=month" class="side-link">
@@ -349,36 +319,36 @@ $popularStories = $stmt->fetchAll();
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <div class="card-dark">
-                        <div class="card-dark-header">Total users</div>
+                        <div class="card-dark-header text-white text-center fw-bold">Total users</div>
                         <div class="card-dark-body">
-                            <div class="stat-number">
+                            <div class="stat-number text-danger text-center">
                                 <?php echo (int)$totalUsers; ?>
                             </div>
-                            <div class="text-muted small">Registered accounts</div>
+                            <div class="text-white text-center small">Registered accounts</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="card-dark">
-                        <div class="card-dark-header">Total stories</div>
+                        <div class="card-dark-header text-white text-center fw-bold">Total stories</div>
                         <div class="card-dark-body">
-                            <div class="stat-number">
+                            <div class="stat-number text-danger text-center">
                                 <?php echo (int)$totalStories; ?>
                             </div>
-                            <div class="text-muted small">All stories</div>
+                            <div class="text-white text-center small">All published stories</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="card-dark">
-                        <div class="card-dark-header">Featured stories</div>
+                        <div class="card-dark-header text-white text-center fw-bold">Featured stories</div>
                         <div class="card-dark-body">
-                            <div class="stat-number">
+                            <div class="stat-number text-danger text-center">
                                 <?php echo (int)$totalFeatured; ?>
                             </div>
-                            <div class="text-muted small">Shown as highlights</div>
+                            <div class="text-white text-center small">Shown as highlights</div>
                         </div>
                     </div>
                 </div>
@@ -390,7 +360,7 @@ $popularStories = $stmt->fetchAll();
                     <div class="card-dark h-100">
                         <div class="card-dark-header d-flex justify-content-between align-items-center">
                             <span>Top popular stories</span>
-                            <a href="stories_list.php" class="btn btn-outline-silent">Manage stories</a>
+                            <a href="stories_list.php" class="btn btn-outline-silent text-white fw-bold">Manage stories</a>
                         </div>
                         <div class="card-dark-body">
                             <?php if (!$popularStories): ?>
@@ -399,35 +369,22 @@ $popularStories = $stmt->fetchAll();
                                 <div class="table-responsive">
                                     <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
                                         <thead>
-                                            <tr>
-                                                <th>Thumbnail</th>
-                                                <th>Title</th>
-                                                <th>Views</th>
-                                                <th>Likes</th>
-                                                <th>Created</th>
-                                            </tr>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Views</th>
+                                            <th>Likes</th>
+                                            <th>Created</th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($popularStories as $story): ?>
-                                                <?php
-                                                $thumb = !empty($story['image_path'])
-                                                    ? $story['image_path']
-                                                    : 'assets/img/default_story.jpg';
-                                                ?>
-                                                <tr>
-                                                    <td>
-                                                        <img
-                                                            src="<?php echo htmlspecialchars($thumb); ?>"
-                                                            alt="Story image"
-                                                            style="width:60px;height:40px;object-fit:cover;border-radius:0.5rem;border:1px solid #374151;"
-                                                        >
-                                                    </td>
-                                                    <td><?php echo htmlspecialchars($story['title']); ?></td>
-                                                    <td><?php echo (int)$story['views']; ?></td>
-                                                    <td><?php echo (int)$story['likes']; ?></td>
-                                                    <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
+                                        <?php foreach ($popularStories as $story): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($story['title']); ?></td>
+                                                <td><?php echo (int)$story['views']; ?></td>
+                                                <td><?php echo (int)$story['likes']; ?></td>
+                                                <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -438,95 +395,11 @@ $popularStories = $stmt->fetchAll();
 
                 <!-- right column -->
                 <div class="col-lg-5">
-
-                    <!-- quick story promotion -->
-                    <div class="card-dark mb-3">
-                        <div class="card-dark-header d-flex justify-content-between align-items-center">
-                            <span>Promote stories</span>
-                            <a href="stories_list.php" class="btn btn-outline-silent btn-sm">
-                                Open stories list
-                            </a>
-                        </div>
-                        <div class="card-dark-body">
-                            <?php if (!$recentStories): ?>
-                                <p class="small text-muted mb-0">
-                                    No stories yet. Publish a story first to promote it.
-                                </p>
-                            <?php else: ?>
-                                <p class="small text-muted">
-                                    Choose which stories should appear in the featured block on the homepage.
-                                </p>
-
-                                <div class="table-responsive">
-                                    <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
-                                        <thead>
-                                            <tr>
-                                                <th class="small">Story</th>
-                                                <th class="small text-center">Status</th>
-                                                <th class="small text-end">Feature</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($recentStories as $s): ?>
-                                                <?php
-                                                $thumb = !empty($s['image_path'])
-                                                    ? $s['image_path']
-                                                    : 'assets/img/default_story.jpg';
-                                                ?>
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <img
-                                                                src="<?php echo htmlspecialchars($thumb); ?>"
-                                                                alt="Story image"
-                                                                style="width:48px;height:32px;object-fit:cover;border-radius:0.5rem;border:1px solid #374151;"
-                                                            >
-                                                            <div>
-                                                                <span class="d-block fw-semibold small">
-                                                                    <?php echo htmlspecialchars($s['title']); ?>
-                                                                </span>
-                                                                <span class="text-muted small">
-                                                                    ID #<?php echo (int)$s['id']; ?>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <?php if ($s['is_published']): ?>
-                                                            <span class="badge bg-success text-dark">Published</span>
-                                                        <?php else: ?>
-                                                            <span class="badge bg-secondary">Draft</span>
-                                                        <?php endif; ?>
-
-                                                        <?php if ($s['is_featured']): ?>
-                                                            <span class="badge bg-warning text-dark ms-1">Featured</span>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <form method="post" class="d-inline">
-                                                            <input type="hidden" name="story_id" value="<?php echo (int)$s['id']; ?>">
-                                                            <input type="hidden" name="action" value="toggle_featured">
-                                                            <button
-                                                                type="submit"
-                                                                class="btn btn-outline-silent btn-sm">
-                                                                <?php echo $s['is_featured'] ? 'Remove' : 'Feature'; ?>
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
                     <!-- homepage sections -->
                     <div class="card-dark mb-3">
-                        <div class="card-dark-header">Homepage sections</div>
+                        <div class="card-dark-header text-white text-center fw-bold">Homepage sections</div>
                         <div class="card-dark-body">
-                            <p class="small text-muted">
+                            <p class="small text-white">
                                 Turn sections on or off. Your home page will follow these settings.
                             </p>
 
@@ -538,7 +411,7 @@ $popularStories = $stmt->fetchAll();
                                         id="show_latest"
                                         name="show_latest"
                                         <?php if ($settings['show_latest']) echo 'checked'; ?>>
-                                    <label class="form-check-label" for="show_latest">
+                                    <label class="form-check-label text-white" for="show_latest">
                                         Show "Latest stories"
                                     </label>
                                 </div>
@@ -550,7 +423,7 @@ $popularStories = $stmt->fetchAll();
                                         id="show_popular"
                                         name="show_popular"
                                         <?php if ($settings['show_popular']) echo 'checked'; ?>>
-                                    <label class="form-check-label" for="show_popular">
+                                    <label class="form-check-label text-white" for="show_popular">
                                         Show "Popular stories"
                                     </label>
                                 </div>
@@ -562,7 +435,7 @@ $popularStories = $stmt->fetchAll();
                                         id="show_featured"
                                         name="show_featured"
                                         <?php if ($settings['show_featured']) echo 'checked'; ?>>
-                                    <label class="form-check-label" for="show_featured">
+                                    <label class="form-check-label text-white" for="show_featured">
                                         Show "Featured stories" section
                                     </label>
                                 </div>
@@ -572,7 +445,7 @@ $popularStories = $stmt->fetchAll();
                                 </button>
                             </form>
 
-                            <p class="small text-muted mt-3 mb-0">
+                            <p class="small mt-3 mb-0 text-white">
                                 Use is_featured on a story to decide which ones appear in the featured block.
                             </p>
                         </div>
@@ -580,18 +453,18 @@ $popularStories = $stmt->fetchAll();
 
                     <!-- slideshow settings -->
                     <div class="card-dark">
-                        <div class="card-dark-header">
+                        <div class="card-dark-header text-white text-center fw-bold">
                             Homepage slideshow
                         </div>
                         <div class="card-dark-body">
-                            <p class="small text-muted">
+                            <p class="text-white small ">
                                 Update the images, titles and order of the hero slideshow on the homepage.
                             </p>
 
                             <form method="post" enctype="multipart/form-data">
                                 <?php foreach ($slidesAdmin as $slide): ?>
                                     <div class="border rounded-3 p-3 mb-3" style="border-color:#1f2937;">
-
+                                        
                                         <div class="mb-2">
                                             <label class="form-label small">Title</label>
                                             <input
@@ -624,7 +497,7 @@ $popularStories = $stmt->fetchAll();
                                                 value="<?php echo htmlspecialchars($slide['image_url']); ?>">
 
                                             <?php if (!empty($slide['image_url'])): ?>
-                                                <div class="small text-muted mt-1">
+                                                <div class="small  mt-1">
                                                     Current: <?php echo htmlspecialchars($slide['image_url']); ?>
                                                 </div>
                                             <?php endif; ?>
@@ -662,7 +535,6 @@ $popularStories = $stmt->fetchAll();
                     </div>
 
                 </div> <!-- /right column -->
-
             </div>
 
         </div>
@@ -671,4 +543,5 @@ $popularStories = $stmt->fetchAll();
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

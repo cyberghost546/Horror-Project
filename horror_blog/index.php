@@ -48,22 +48,6 @@ function se_category_label(string $cat): string
     return strtoupper($cat);
 }
 
-// Load featured stories
-$featuredStmt = $pdo->query("
-    SELECT
-        id,
-        title,
-        category,
-        content,
-        created_at,
-        image_path
-    FROM stories
-    WHERE is_published = 1
-      AND is_featured = 1
-    ORDER BY created_at DESC
-    LIMIT 3
-");
-$featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -74,14 +58,209 @@ $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="utf-8">
     <title>silent_evidence | Horror Stories</title>
-    <link rel="stylesheet" href="css/index.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css"> <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Custom styles for the horror vibe -->
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .hero-section {
+            position: relative;
+            margin-top: 24px;
+            margin-bottom: 40px;
+            padding: 48px 32px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: radial-gradient(circle at top left, #f60000 0, #111827 45%, #020617 80%);
+            color: #f9fafb;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 10% 0, rgba(255, 255, 255, 0.08) 0, transparent 55%), radial-gradient(circle at 90% 100%, rgba(0, 0, 0, 0.8) 0, transparent 60%);
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 560px;
+            z-index: 1;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: #fecaca;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: #e5e7eb;
+            max-width: 460px;
+            margin-bottom: 20px;
+        }
+
+        .hero-buttons a {
+            border-radius: 999px;
+        }
+
+        .btn-silent-primary {
+            background-color: #f60000;
+            color: #f9fafb;
+            box-shadow: 0 8px 20px rgba(246, 0, 0, 0.45);
+        }
+
+        .btn-silent-primary:hover {
+            background-color: #dc2626;
+            color: #f9fafb;
+            box-shadow: 0 12px 28px rgba(246, 0, 0, 0.6);
+        }
+
+        .btn-silent-ghost {
+            background-color: rgba(15, 23, 42, 0.85);
+            color: #f9fafb;
+            border-color: rgba(248, 250, 252, 0.2);
+        }
+
+        .btn-silent-ghost:hover {
+            background-color: rgba(15, 23, 42, 1);
+            color: #f9fafb;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #fecaca;
+            margin-top: 10px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background: #fecaca;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #f9fafb;
+        }
+
+        .story-card {
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #1f2933;
+            transition: border 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
+        }
+
+        .story-card:hover {
+            border-color: #f60000;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .story-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #f87171;
+        }
+
+        .story-title {
+            font-size: 16px;
+            color: #f9fafb;
+        }
+
+        .story-excerpt {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .story-meta {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .category-card {
+            background: #020617;
+            border-radius: 14px;
+            border: 1px solid #111827;
+            transition: border 0.15s ease, background 0.15s ease, transform 0.15s ease;
+        }
+
+        .category-card:hover {
+            border-color: #f60000;
+            background: #020817;
+            transform: translateY(-1px);
+        }
+
+        .community-box {
+            background: #020617;
+            border-radius: 18px;
+            border: 1px solid #111827;
+        }
+
+        .community-panel {
+            background: #020817;
+            border-radius: 16px;
+            border: 1px solid #1f2933;
+        }
+
+        .panel-label {
+            color: #9ca3af;
+        }
+
+        .panel-value {
+            color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .panel-live {
+            color: #f97373;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-section {
+                padding: 32px 20px;
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <?php include 'include/header.php'; ?>
+    <?php
+    include 'include/header.php';
+    ?>
     <main class="container py-4"> <!-- Hero section -->
 
         <!-- Featured Slideshow -->
@@ -107,7 +286,7 @@ $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
                                     <img
                                         src="<?php echo htmlspecialchars($slide['image_url']); ?>"
-                                        class="d-block w-100 rounded-4"
+                                        class="d-block w-100"
                                         style="object-fit:cover;height:360px;">
                                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
                                         <h5><?php echo htmlspecialchars($slide['title']); ?></h5>
@@ -212,49 +391,28 @@ $featuredStories = $featuredStmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Categories -->
         <section class="mb-5">
             <hr>
+            <!-- Paranormal Feature Card -->
+            <section class="mb-4">
+                <div class="paranormal-card p-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap"
+                    style="background:#0b0f19;border:1px solid #1a2233;">
 
-            <!-- Featured / Paranormal Feature Card -->
-            <?php if (!empty($featuredStories)): ?>
-                <section class="mb-4">
-                    <div class="paranormal-card p-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap"
-                        style="background:#0b0f19;border:1px solid #1a2233;">
-
-                        <div class="mb-3">
-                            <h2 class="text-light mb-2">Featured on Silent Evidence</h2>
-                            <p class="text-secondary mb-3" style="max-width: 600px;">
-                                Highlighted by our community. A collection of stories chosen by the admins to appear on the homepage.
-                            </p>
-
-                            <a href="stories.php?filter=featured" class="btn btn-silent-primary btn-sm px-4 py-2">
-                                View All Featured Stories
-                            </a>
-                        </div>
-
-                        <?php if (!empty($featuredStories[0])): ?>
-                            <?php
-                            // use the same image the user set for the story
-                            $featured = $featuredStories[0];
-
-                            $featuredThumb = !empty($featured['image_path'])
-                                ? $featured['image_path']
-                                : 'assets/img/default_story.jpg';
-                            ?>
-                            <a href="story.php?id=<?php echo (int)$featured['id']; ?>">
-                                <img
-                                    src="<?php echo htmlspecialchars($featuredThumb); ?>"
-                                    alt="<?php echo htmlspecialchars($featured['title']); ?>"
-                                    class="rounded-4 shadow-lg"
-                                    style="width:500px;height:400px;object-fit:cover;border:1px solid #1f2937;">
-                            </a>
-                        <?php endif; ?>
+                    <div class="mb-3">
+                        <h2 class="text-light mb-2">Enter the Paranormal</h2>
+                        <p class="text-secondary mb-3" style="max-width:420px;">
+                            Ghosts, spirits, haunted houses, cursed objects. Explore the most unsettling corners of Silent Evidence.
+                        </p>
+                        <a href="stories.php?cat=paranormal"
+                            class="btn btn-silent-primary btn-sm px-4 py-2">
+                            Explore Paranormal Stories
+                        </a>
                     </div>
-                </section>
-            <?php endif; ?>
 
-
-
+                    <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80"
+                        class="rounded-4 shadow-lg"
+                        style="width:260px;height:160px;object-fit:cover;border:1px solid #1f2937;">
+                </div>
+            </section>
             <hr>
-
 
             <div class="d-flex justify-content-between align-items-baseline mb-3">
                 <h2 class="section-title mb-0">Browse by vibe</h2>

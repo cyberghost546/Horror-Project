@@ -63,8 +63,94 @@ $users = $stmt->fetchAll();
     <meta charset="utf-8">
     <title>Users | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000;
+            color: #e5e7eb;
+            font-family: system-ui;
+        }
+
+        .layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #020617;
+            border-right: 1px solid #111827;
+            padding: 16px 12px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .side-link.active,
+        .side-link:hover {
+            background-color: #111827;
+            color: #fff;
+        }
+
+        .main-area {
+            flex: 1;
+            background-color: #020617;
+        }
+
+        .main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #111827;
+        }
+
+        .card-dark {
+            background-color: #020617;
+            border: 1px solid #111827;
+            border-radius: 14px;
+        }
+
+        .card-dark-header {
+            border-bottom: 1px solid #111827;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .card-dark-body {
+            padding: 16px;
+        }
+
+        .table-dark-custom {
+            font-size: 0.85rem;
+        }
+
+        form.role-form select {
+            background-color: #111827;
+            color: #e5e7eb;
+            border-color: #374151;
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+
+        form.role-form button {
+            border-radius: 6px;
+            padding: 3px 10px;
+        }
+    </style>
 </head>
 
 <body>

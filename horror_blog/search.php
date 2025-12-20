@@ -53,8 +53,45 @@ $stories = $stmt->fetchAll();
     <meta charset="utf-8">
     <title>Search | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .story-card {
+            background-color: #0f172a;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            color: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+            border-color: #f60000;
+            box-shadow: 0 0 15px rgba(246, 0, 0, 0.25);
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: #f87171;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+    </style>
 </head>
 
 <body>

@@ -117,13 +117,123 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="utf-8">
   <title>My profile | silent_evidence</title>
-  <link rel="stylesheet" href="css/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet">
 
+  <style>
+    body {
+      background-color: #020617;
+      color: #e5e7eb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page-wrapper {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .profile-header {
+      margin-bottom: 18px;
+    }
+
+    .profile-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .card-dark {
+      background-color: #020617;
+      border-radius: 16px;
+      border: 1px solid #111827;
+    }
+
+    .card-dark .card-header {
+      border-bottom-color: #111827;
+      font-size: 1rem;
+      color: #e5e7eb;
+    }
+
+    .avatar-lg {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 2px solid #111827;
+    }
+
+    .username-tag {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .meta-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+    }
+
+    .stat-number {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .text-muted-small {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .btn-outline-silent {
+      border-color: #4b5563;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      padding: 6px 16px;
+    }
+
+    .btn-outline-silent:hover {
+      background-color: #111827;
+      border-color: #6b7280;
+      color: #ffffff;
+    }
+
+    /* modal form styling */
+    .form-control {
+      background-color: #111827;
+      border-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    .form-control:focus {
+      border-color: #6366f1;
+      box-shadow: none;
+    }
+
+    .avatar-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 2px solid #1f2937;
+    }
+
+    .btn-save {
+      background-color: #1f2937;
+      color: #ffffff;
+      border-radius: 999px;
+    }
+
+    .btn-save:hover {
+      background-color: #111827;
+    }
+  </style>
 </head>
 
 <body>
@@ -165,31 +275,31 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
               alt="Avatar"
               class="avatar-lg mb-3">
 
-            <h2 class="h5 mb-1">
+            <h2 class="h5 mb-1 text-white">
               <?php echo htmlspecialchars($user['display_name'] ?: $user['username']); ?>
             </h2>
 
-            <div class="username-tag mb-3">
+            <div class="username-tag mb-3 text-danger">
               @<?php echo htmlspecialchars($user['username']); ?>
             </div>
 
             <div class="mb-2">
-              <div class="meta-label">Email</div>
-              <div class="meta-value">
+              <div class="meta-label text-white">Email</div>
+              <div class="meta-value text-danger">
                 <?php echo htmlspecialchars($user['email']); ?>
               </div>
             </div>
 
             <div class="mb-2">
-              <div class="meta-label">Member since</div>
-              <div class="meta-value">
+              <div class="meta-label text-white">Member since</div>
+              <div class="meta-value text-danger">
                 <?php echo date('d M Y', strtotime($user['created_at'])); ?>
               </div>
             </div>
 
             <div class="mb-3">
-              <div class="meta-label">Last login</div>
-              <div class="meta-value">
+              <div class="meta-label text-white">Last login</div>
+              <div class="meta-value text-danger">
                 <?php echo $user['last_login']
                   ? date('d M Y H:i', strtotime($user['last_login']))
                   : 'First time online'; ?>
@@ -197,8 +307,8 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="mt-2">
-              <div class="meta-label">Total stories</div>
-              <div class="stat-number">
+              <div class="meta-label text-white">Total stories</div>
+              <div class="stat-number text-danger">
                 <?php echo $totalStories; ?>
               </div>
             </div>
@@ -215,7 +325,7 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
           <div class="card-body">
             <?php if ($user['bio']): ?>
-              <p class="mb-0">
+              <p class="mb-0 text-danger">
                 <?php echo nl2br(htmlspecialchars($user['bio'])); ?>
               </p>
             <?php else: ?>

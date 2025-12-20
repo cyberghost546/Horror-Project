@@ -62,8 +62,140 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <title>Login | silent_evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #020617;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 430px;
+            background-color: #0f172a;
+            border-radius: 20px;
+            border: 1px solid #1e293b;
+            padding: 28px;
+            box-shadow: 0 0 25px rgba(246, 0, 0, 0.25);
+        }
+
+        .auth-title {
+            color: #f60000;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .label-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .form-control {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0 !important;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus {
+            background-color: #1e293b;
+            border-color: #f60000;
+            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .btn-login {
+            background-color: #f60000;
+            color: #0f172a;
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-login:hover {
+            background-color: #ca0000;
+        }
+
+        .divider {
+            text-align: center;
+            color: #64748b;
+            margin: 18px 0;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            background-color: #0f172a;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            display: inline-block;
+            width: 30%;
+            border-bottom: 1px solid #1f2937;
+            vertical-align: middle;
+        }
+
+        .google-btn {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+        }
+
+        .google-btn:hover {
+            background-color: #293548;
+        }
+
+        .small-text {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .small-text a {
+            color: #f60000;
+            text-decoration: none;
+        }
+
+        .small-text a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-small {
+            font-size: 0.8rem;
+            padding: 0.45rem 0.6rem;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
 <body>
@@ -112,14 +244,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         required>
                 </div>
 
-                <p class="small-text">
-                    <a href="forgot_password.php">Forgot your password?</a>
-                </p>
-
                 <button type="submit" class="btn btn-login mt-3">
                     Log in
                 </button>
-
             </form>
 
             <p class="small-text">

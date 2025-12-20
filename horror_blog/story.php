@@ -161,10 +161,245 @@ if ($story) {
         <?php echo $story ? htmlspecialchars($story['title']) . ' | silent_evidence' : 'Story not found | silent_evidence'; ?>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/style.css">
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .breadcrumb a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #e5e7eb;
+        }
+
+        .story-card {
+            background-color: #020617;
+            border-radius: 18px;
+            border: 1px solid #111827;
+            padding: 22px 20px 26px;
+        }
+
+        .story-image {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background-color: #020617;
+            border: 1px solid #111827;
+        }
+
+        .story-image img {
+            width: 100%;
+            max-height: 660px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .story-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #f87171;
+        }
+
+        .story-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #f9fafb;
+        }
+
+        .story-meta {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background-color: #4b5563;
+        }
+
+        .author-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid #111827;
+        }
+
+        .author-name {
+            font-size: 0.85rem;
+            color: #e5e7eb;
+        }
+
+        .author-username {
+            font-size: 0.78rem;
+            color: #9ca3af;
+        }
+
+        .story-body {
+            font-size: 0.97rem;
+            line-height: 1.7;
+            color: #e5e7eb;
+            white-space: pre-wrap;
+        }
+
+        .story-body p {
+            margin-bottom: 1rem;
+        }
+
+        .stats-row {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background-color: #020617;
+            border: 1px solid #111827;
+            font-size: 0.78rem;
+        }
+
+        .action-row {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline-silent {
+            border-color: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.85rem;
+            border-radius: 999px;
+            padding: 6px 14px;
+        }
+
+        .btn-outline-silent:hover {
+            background-color: #111827;
+            border-color: #6b7280;
+            color: #ffffff;
+        }
+
+        .btn-outline-silent.active {
+            background-color: #f60000;
+            border-color: #f60000;
+            color: #f9fafb;
+        }
+
+        .empty-state {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .empty-state h1 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            color: #9ca3af;
+        }
+
+        /* comments */
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid #111827;
+        }
+
+        .comment-author {
+            font-size: 0.85rem;
+            color: #e5e7eb;
+        }
+
+        .comment-meta {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .comment-body {
+            font-size: 0.9rem;
+            color: #e5e7eb;
+            margin-top: 4px;
+            white-space: pre-wrap;
+        }
+
+        .comment-form textarea.form-control {
+            background-color: #0f172a;
+            border-color: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .comment-form textarea.form-control:focus {
+            border-color: #f60000;
+            box-shadow: none;
+        }
+
+        .btn-comment {
+            background-color: #1f2937;
+            color: #ffffff;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            padding: 6px 16px;
+        }
+
+        .btn-comment:hover {
+            background-color: #111827;
+        }
+
+        .comment-reply {
+            border-left: 1px solid #111827;
+            padding-left: 12px;
+            margin-top: 8px;
+        }
+    </style>
 
 </head>
 

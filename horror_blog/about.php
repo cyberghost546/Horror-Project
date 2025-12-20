@@ -8,8 +8,58 @@ session_start();
     <meta charset="utf-8">
     <title>About Silent Evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            color: #f9fafb;
+        }
+
+        h2 {
+            font-weight: 600;
+            color: #f9fafb;
+            font-size: 1.4rem;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .section-box {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-box:hover {
+            border-color: #f60000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
+            transition: 0.25s;
+        }
+
+        .highlight {
+            color: #f60000;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body>
