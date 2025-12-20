@@ -174,12 +174,15 @@ $stories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <?php echo htmlspecialchars($story['title']); ?>
                                             </td>
                                             <td>
-                                                <span class="badge bg-secondary">
+                                                <span class="badge bg-success ">
                                                     <?php echo htmlspecialchars($story['category']); ?>
                                                 </span>
                                             </td>
                                             <td>
-                                                <?php echo htmlspecialchars($story['display_name'] ?: $story['username']); ?>
+                                                <p>
+                                                    <small class="text-white">@<?php echo htmlspecialchars($story['username']); ?></small>
+                                                </p>
+                                                <!-- <?php echo htmlspecialchars($story['display_name'] ?: $story['username']); ?> -->
                                             </td>
                                             <td>
                                                 <?php if ($story['is_published']): ?>
