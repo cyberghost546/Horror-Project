@@ -254,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <div class="card card-dark">
-            <div class="card-dark-header">
+            <div class="card-dark-header text-uppercase text-danger text-center fw-bold fs-5">
                 New story
             </div>
             <div class="card-dark-body">

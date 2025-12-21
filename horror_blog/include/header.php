@@ -49,14 +49,14 @@ $userAvatar = $_SESSION['user_avatar'] ?? 'https://i.pravatar.cc/40';
 
                     <!-- Not logged in: show Login / Sign up -->
                     <div class="d-flex gap-2 mt-2 mt-lg-0">
-                        <a href="login.php" class="btn btn-outline-light btn-sm rounded-pill">Login</a>
+                        <a href="login.php" class="btn btn-outline-danger btn-sm rounded-pill">Login</a>
                         <a href="signup.php" class="btn btn-warning btn-sm rounded-pill fw-semibold">Sign up</a>
                     </div>
 
                 <?php else: ?>
 
                     <!-- Logged in: show profile picture with dropdown -->
-                    <div class="dropdown mt-2 mt-lg-0 btn-warning rounded-pill">
+                    <div class="dropdown mt-2 mt-lg-0">
                         <button
                             class="btn btn-profile dropdown-toggle d-flex align-items-center"
                             type="button"
@@ -119,7 +119,7 @@ $userAvatar = $_SESSION['user_avatar'] ?? 'https://i.pravatar.cc/40';
 
     .brand-text {
         font-size: 1rem;
-        color: #e5e7eb;
+        color: #ebe5e5ff;
     }
 
     /* nav links */
@@ -149,6 +149,18 @@ $userAvatar = $_SESSION['user_avatar'] ?? 'https://i.pravatar.cc/40';
     .search-input:focus {
         box-shadow: none;
         border-color: #818cf8;
+    }
+
+    .btn-outline-danger {
+        background-color: #fb2424ff;
+        border-color: #fb2424ff;
+        color: #111827;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #f50b0bc4;
+        border-color: #f50b0bc4;
+        color: #111827;
     }
 
     /* auth buttons */

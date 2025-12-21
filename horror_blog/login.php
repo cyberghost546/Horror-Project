@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 20px;
             border: 1px solid #1e293b;
             padding: 28px;
-            box-shadow: 0 0 25px rgba(246, 0, 0, 0.25);
+            box-shadow: 0 0 100px rgba(246, 0, 0, 0.25);
         }
 
         .auth-title {
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-control:focus {
             background-color: #1e293b;
             border-color: #f60000;
-            box-shadow: 0 0 0 2px rgba(246, 0, 0, 0.3);
+            box-shadow: 0 0 0 5px rgba(246, 0, 0, 0.3);
         }
 
         .form-control::placeholder {

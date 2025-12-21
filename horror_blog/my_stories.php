@@ -45,7 +45,7 @@ $stories = $stmt->fetchAll(); ?>
         }
 
         .page-wrapper {
-            max-width: 2000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 24px 16px 40px;
         }

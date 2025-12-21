@@ -173,7 +173,7 @@ $users = $stmt->fetchAll();
         <div class="main-area">
 
             <div class="main-header d-flex flex-wrap justify-content-between gap-2 align-items-center">
-                <h1 class="page-title">Users</h1>
+                <h1 class="page-title fw-bold ">Users</h1>
 
                 <form method="get" class="d-flex gap-2">
                     <input
