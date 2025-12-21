@@ -36,6 +36,9 @@ $userAvatar = $_SESSION['user_avatar'] ?? 'https://i.pravatar.cc/40';
                     <li class="nav-item">
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'about.php' ? 'active' : '' ?>" href="about.php">About</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>" href="contact.php">Contact</a>
+                    </li>
                 </ul>
 
                 <!-- Search -->

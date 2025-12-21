@@ -164,6 +164,7 @@ $users = $stmt->fetchAll();
             <a href="dashboard.php" class="side-link"><span>🏠</span>Dashboard</a>
             <a href="stories_list.php" class="side-link"><span>📖</span>Stories</a>
             <a href="users_list.php" class="side-link active"><span>👥</span>Users</a>
+            <a href="contact_messages.php" class="side-link"><span>✉️</span>Contact Messages</a>
 
             <div style="margin-top:auto">
                 <a href="logout.php" class="side-link"><span>⏻</span>Sign out</a>

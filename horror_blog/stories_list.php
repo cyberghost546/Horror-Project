@@ -249,24 +249,13 @@ $sortUrlIdDesc = 'stories_list.php?' . http_build_query($idDescParams); ?>
         <aside class="sidebar">
             <div class="sidebar-title">silent_evidence</div>
 
-            <a href="dashboard.php" class="side-link">
-                <span class="icon">🏠</span>
-                <span>Dashboard</span>
-            </a>
-            <a href="stories_list.php" class="side-link active">
-                <span class="icon">📖</span>
-                <span>Stories</span>
-            </a>
-            <a href="users_list.php" class="side-link">
-                <span class="icon">👥</span>
-                <span>Users</span>
-            </a>
+            <a href="dashboard.php" class="side-link"><span>🏠</span>Dashboard</a>
+            <a href="stories_list.php" class="side-link"><span>📖</span>Stories</a>
+            <a href="users_list.php" class="side-link active"><span>👥</span>Users</a>
+            <a href="contact_messages.php" class="side-link"><span>✉️</span>Contact Messages</a>
 
             <div style="margin-top:auto">
-                <a href="logout.php" class="side-link">
-                    <span class="icon">⏻</span>
-                    <span>Sign out</span>
-                </a>
+                <a href="logout.php" class="side-link"><span>⏻</span>Sign out</a>
             </div>
         </aside>
 
