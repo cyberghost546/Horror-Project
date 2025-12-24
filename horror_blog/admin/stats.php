@@ -65,7 +65,7 @@ $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1
             content: "";
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 60%);
+            background: radial-gradient(circle at top, rgba(242, 50, 50, 0.39), transparent 60%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }

@@ -143,6 +143,16 @@ $scoreColor =
             font-size: 0.75rem;
             padding: 4px 8px;
         }
+
+        .back-btn {
+            background-color: #020617;
+            border: 1px solid #111827;
+            color: #e5e7eb;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -150,9 +160,12 @@ $scoreColor =
 
     <div class="page-wrap">
 
+        <div class="page-header">
+            <button class="back-btn" onclick="history.back()">← Back</button>
+            <h1 class="mb-4">🛡️ Security Dashboard</h1>
+        </div>
 
 
-        <h1 class="mb-4">🛡️ Security Dashboard</h1>
 
         <!-- SECURITY SCORE -->
         <div class="card-dark mb-4">
