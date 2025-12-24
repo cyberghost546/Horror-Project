@@ -93,6 +93,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$range = $_GET['range'] ?? 'week';
+
+switch ($range) {
+    case 'today':
+        $dateWhere = "created_at >= CURDATE()";
+        break;
+
+    case 'month':
+        $dateWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        break;
+
+    default:
+        $dateWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
+        $range = 'week';
+}
+
+switch ($range) {
+    case 'today':
+        $currentWhere = "created_at >= CURDATE()";
+        $previousWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+                          AND created_at < CURDATE()";
+        break;
+
+    case 'month':
+        $currentWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        $previousWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
+                          AND created_at < DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        break;
+
+    default:
+        $currentWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
+        $previousWhere = "created_at >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
+                          AND created_at < DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
+}
+
+$currentStories = $pdo->query("
+    SELECT COUNT(*) FROM stories WHERE $currentWhere
+")->fetchColumn();
+
+$previousStories = $pdo->query("
+    SELECT COUNT(*) FROM stories WHERE $previousWhere
+")->fetchColumn();
+
+$storyChange = $currentStories - $previousStories;
+
+
+$activityStmt = $pdo->query("
+    SELECT 
+        'user' AS type,
+        username AS title,
+        created_at
+    FROM users
+
+    UNION ALL
+
+    SELECT 
+        'story' AS type,
+        title,
+        created_at
+    FROM stories
+
+    UNION ALL
+
+    SELECT 
+        'featured' AS type,
+        title,
+        updated_at AS created_at
+    FROM stories
+    WHERE is_featured = 1
+
+    ORDER BY created_at DESC
+    LIMIT 10
+");
+
+$activities = $activityStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 // fetch homepage settings
 $stmt = $pdo->query('SELECT * FROM homepage_settings WHERE id = 1 LIMIT 1');
 $settings = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -122,45 +199,92 @@ $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1
 // top 5 popular stories by views
 $stmt = $pdo->query('SELECT title, views, likes, created_at FROM stories ORDER BY views DESC LIMIT 5');
 $popularStories = $stmt->fetchAll();
+
+$chartStmt = $pdo->query("
+    SELECT 
+        DATE(created_at) AS day,
+        COUNT(*) AS total
+    FROM stories
+    WHERE $dateWhere
+    GROUP BY DATE(created_at)
+    ORDER BY DATE(created_at)
+");
+
+$chartData = [
+    'labels' => [],
+    'values' => []
+];
+
+while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
+    $chartData['labels'][] = date('d M', strtotime($row['day']));
+    $chartData['values'][] = (int)$row['total'];
+}
+
+
+
+$stmt = $pdo->query("
+    SELECT title, views, likes, created_at
+    FROM stories
+    WHERE $dateWhere
+    ORDER BY views DESC
+    LIMIT 5
+");
+$popularStories = $stmt->fetchAll();
+
 ?>
+
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Dashboard silent_evidence</title>
+    <title>Dashboard Silent Evidence</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
-            background-color: #020617;
+            margin: 0;
+            background-color: #0b1220;
             color: #e5e7eb;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: system-ui, sans-serif;
         }
 
-        .layout-wrapper {
+        .wrapper {
             display: flex;
             min-height: 100vh;
         }
 
         .sidebar {
-            width: 250px;
+            width: 260px;
             background-color: #020617;
             border-right: 1px solid #111827;
-            padding: 16px 12px;
+            padding: 16px;
         }
 
-        .sidebar-title {
-            font-size: 1rem;
-            font-weight: 600;
+        .sidebar h6 {
+            font-size: 0.9rem;
             margin-bottom: 20px;
         }
 
-        .nav-section-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: #6b7280;
-            margin: 18px 0 6px 8px;
+        .nav-link {
+            color: #9ca3af;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #111827;
+            color: #fff;
+        }
+
+        .table-dark-custom tbody tr:hover {
+            background-color: #111827;
         }
 
         .side-link {
@@ -185,69 +309,64 @@ $popularStories = $stmt->fetchAll();
             text-align: center;
         }
 
-        .main-area {
+        .main {
             flex: 1;
-            background-color: #020617;
         }
 
-        .main-header {
+        .text-success {
+            color: #22c55e !important;
+        }
+
+        .text-danger {
+            color: #ef4444 !important;
+        }
+
+        .header {
             padding: 16px 24px;
             border-bottom: 1px solid #111827;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .main-content {
-            padding: 20px 24px 32px;
-        }
-
-        .page-title {
+        .header h1 {
             font-size: 1.6rem;
-            font-weight: 600;
             margin: 0;
+        }
+
+        .content {
+            padding: 24px;
         }
 
         .card-dark {
             background-color: #020617;
             border: 1px solid #111827;
             border-radius: 14px;
-        }
-
-        .card-dark-header {
-            border-bottom: 1px solid #111827;
-            padding: 12px 16px;
-            font-size: 0.9rem;
-            color: #9ca3af;
-        }
-
-        .card-dark-body {
             padding: 16px;
         }
 
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .table-dark-custom {
+        .table-dark-custom th,
+        .table-dark-custom td {
+            border-color: #111827;
             font-size: 0.85rem;
         }
 
-        .table-dark-custom thead {
-            color: #9ca3af;
-        }
-
-        .table-dark-custom tbody tr td {
-            border-color: #111827;
-        }
-
-        .btn-outline-silent {
-            border-color: #374151;
+        .btn-outline {
+            border: 1px solid #374151;
             color: #e5e7eb;
-            font-size: 0.8rem;
         }
 
-        .btn-outline-silent:hover {
+        .btn-outline:hover {
             background-color: #111827;
-            border-color: #4b5563;
+            color: #fff;
+        }
+
+        .card-dark ul li:last-child {
+            border-bottom: none;
+        }
+
+        .btn-outline.active {
+            background-color: #111827;
             color: #ffffff;
         }
     </style>
@@ -255,12 +374,13 @@ $popularStories = $stmt->fetchAll();
 
 <body>
     <?php include 'include/header.php'; ?>
+    <div class="wrapper">
 
-    <div class="layout-wrapper">
-        <!-- sidebar -->
+
         <aside class="sidebar">
-            <div class="sidebar-title">Company name</div>
-            <a href="dashboard.php" class="side-link active">
+            <h6>Silent Evidence</h6>
+
+            <a class="nav-link active" href="#">
                 <span class="icon">🏠</span>
                 <span>Dashboard</span>
             </a>
@@ -277,15 +397,14 @@ $popularStories = $stmt->fetchAll();
                 <span>Contact messages</span>
             </a>
 
-            <div class="nav-section-label">Saved views</div>
-            <a href="dashboard.php?range=month" class="side-link">
-                <span class="icon">🗓️</span>
-                <span>Current month</span>
-            </a>
-            <a href="dashboard_week.php" class="side-link">
-                <span class="icon">📈</span>
-                <span>Last week</span>
-            </a>
+            <hr class="text-secondary">
+
+            <a class="nav-link" href="admin/stats.php">Stats</a>
+            <a class="nav-link" href="admin/slideshow.php">Slideshow For Homepage</a>
+            <a class="nav-link" href="admin/popular_stories.php">Popular Stories</a>
+            <a class="nav-link" href="admin/homepage_sections.php">Homepage Sections</a>
+            <a class="nav-link" href="admin/security_dashboard.php">Security Dashboard</a>
+            <hr class="text-secondary">
 
             <div style="margin-top:auto">
                 <div class="nav-section-label">Account</div>
@@ -300,251 +419,179 @@ $popularStories = $stmt->fetchAll();
             </div>
         </aside>
 
-        <!-- main -->
-        <div class="main-area">
-            <div class="main-header d-flex justify-content-between align-items-center">
-                <h1 class="page-title mb-0">Dashboard</h1>
+        <main class="main">
+
+            <div class="header">
+                <h1>Dashboard</h1>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-silent">Share</button>
-                    <button class="btn btn-outline-silent">Export</button>
-                    <button class="btn btn-outline-silent">This week</button>
+                    <a href="?range=today" class="btn btn-outline btn-sm <?php if ($range === 'today') echo 'active'; ?>">
+                        Today
+                    </a>
+                    <a href="?range=week" class="btn btn-outline btn-sm <?php if ($range === 'week') echo 'active'; ?>">
+                        This week
+                    </a>
+                    <a href="?range=month" class="btn btn-outline btn-sm <?php if ($range === 'month') echo 'active'; ?>">
+                        This month
+                    </a>
                 </div>
+
             </div>
 
-            <div class="main-content">
-                <?php if ($success): ?>
-                    <div class="alert alert-success py-2 small">
-                        <?php echo htmlspecialchars($success); ?>
-                    </div>
-                <?php endif; ?>
-
-                <!-- stats row -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header text-white text-center fw-bold">Total users</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number text-danger text-center">
-                                    <?php echo (int)$totalUsers; ?>
-                                </div>
-                                <div class="text-white text-center small">Registered accounts</div>
-                            </div>
+            <div class="content">
+                <div class="card-dark mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Stories created</h5>
+                        <div class="small text-muted">
+                            Compared to previous period
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header text-white text-center fw-bold">Total stories</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number text-danger text-center">
-                                    <?php echo (int)$totalStories; ?>
-                                </div>
-                                <div class="text-white text-center small">All published stories</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card-dark">
-                            <div class="card-dark-header text-white text-center fw-bold">Featured stories</div>
-                            <div class="card-dark-body">
-                                <div class="stat-number text-danger text-center">
-                                    <?php echo (int)$totalFeatured; ?>
-                                </div>
-                                <div class="text-white text-center small">Shown as highlights</div>
-                            </div>
-                        </div>
+                    <div class="fs-4 fw-bold
+        <?php echo $storyChange >= 0 ? 'text-success' : 'text-danger'; ?>">
+                        <?php
+                        echo $storyChange >= 0
+                            ? '+' . $storyChange
+                            : $storyChange;
+                        ?>
                     </div>
                 </div>
 
-                <div class="row g-3">
-                    <!-- left column: popular stories -->
-                    <div class="col-lg-7">
-                        <div class="card-dark h-100">
-                            <div class="card-dark-header d-flex justify-content-between align-items-center">
-                                <span>Top popular stories</span>
-                                <a href="stories_list.php" class="btn btn-outline-silent text-white fw-bold">Manage stories</a>
-                            </div>
-                            <div class="card-dark-body">
-                                <?php if (!$popularStories): ?>
-                                    <p class="small text-muted mb-0">No stories yet</p>
-                                <?php else: ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-dark table-hover table-sm align-middle table-dark-custom">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Views</th>
-                                                    <th>Likes</th>
-                                                    <th>Created</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($popularStories as $story): ?>
-                                                    <tr>
-                                                        <td><?php echo htmlspecialchars($story['title']); ?></td>
-                                                        <td><?php echo (int)$story['views']; ?></td>
-                                                        <td><?php echo (int)$story['likes']; ?></td>
-                                                        <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+                <!-- chart stays -->
+                <div class="card-dark mb-4">
+                    <canvas id="salesChart" height="90"></canvas>
+                </div>
+
+                <!-- real popular stories table -->
+                <div class="card-dark">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Top popular stories</h5>
+                        <a href="stories_list.php" class="btn btn-outline-silent btn-sm text-white fw-bold">
+                            Manage stories
+                        </a>
                     </div>
 
-                    <!-- right column -->
-                    <div class="col-lg-5">
-                        <!-- homepage sections -->
-                        <div class="card-dark mb-3">
-                            <div class="card-dark-header text-white text-center fw-bold">Homepage sections</div>
-                            <div class="card-dark-body">
-                                <p class="small text-white">
-                                    Turn sections on or off. Your home page will follow these settings.
-                                </p>
+                    <?php if (!$popularStories): ?>
+                        <p class="small text-muted mb-0">No stories yet</p>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover table-sm align-middle table-dark-custom mb-0">
+                                <thead>
+                                    <tr style="cursor:pointer"
+                                        onclick="window.location='stories_list.php?search=<?php echo urlencode($story['title']); ?>'">
 
-                                <form method="post">
-                                    <div class="form-check form-switch mb-2">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_latest"
-                                            name="show_latest"
-                                            <?php if ($settings['show_latest']) echo 'checked'; ?>>
-                                        <label class="form-check-label text-white" for="show_latest">
-                                            Show "Latest stories"
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-switch mb-2">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_popular"
-                                            name="show_popular"
-                                            <?php if ($settings['show_popular']) echo 'checked'; ?>>
-                                        <label class="form-check-label text-white" for="show_popular">
-                                            Show "Popular stories"
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-switch mb-3">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="show_featured"
-                                            name="show_featured"
-                                            <?php if ($settings['show_featured']) echo 'checked'; ?>>
-                                        <label class="form-check-label text-white" for="show_featured">
-                                            Show "Featured stories" section
-                                        </label>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-outline-silent">
-                                        Save settings
-                                    </button>
-                                </form>
-
-                                <p class="small mt-3 mb-0 text-white">
-                                    Use is_featured on a story to decide which ones appear in the featured block.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- slideshow settings -->
-                        <div class="card-dark">
-                            <div class="card-dark-header text-white text-center fw-bold">
-                                Homepage slideshow
-                            </div>
-                            <div class="card-dark-body">
-                                <p class="text-white small ">
-                                    Update the images, titles and order of the hero slideshow on the homepage.
-                                </p>
-
-                                <form method="post" enctype="multipart/form-data">
-                                    <?php foreach ($slidesAdmin as $slide): ?>
-                                        <div class="border rounded-3 p-3 mb-3" style="border-color:#1f2937;">
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Title</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    name="slides[<?php echo $slide['id']; ?>][title]"
-                                                    value="<?php echo htmlspecialchars($slide['title']); ?>">
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Caption</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    name="slides[<?php echo $slide['id']; ?>][caption]"
-                                                    value="<?php echo htmlspecialchars($slide['caption']); ?>">
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label class="form-label small">Image</label>
-                                                <input
-                                                    type="file"
-                                                    class="form-control form-control-sm"
-                                                    name="slides_files[<?php echo $slide['id']; ?>]"
-                                                    accept="image/*">
-
-                                                <input
-                                                    type="hidden"
-                                                    name="slides[<?php echo $slide['id']; ?>][current_image]"
-                                                    value="<?php echo htmlspecialchars($slide['image_url']); ?>">
-
-                                                <?php if (!empty($slide['image_url'])): ?>
-                                                    <div class="small  mt-1">
-                                                        Current: <?php echo htmlspecialchars($slide['image_url']); ?>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <div class="row g-2 align-items-center">
-                                                <div class="col-4">
-                                                    <label class="form-label small">Order</label>
-                                                    <input
-                                                        type="number"
-                                                        class="form-control form-control-sm"
-                                                        name="slides[<?php echo $slide['id']; ?>][sort_order]"
-                                                        value="<?php echo (int)$slide['sort_order']; ?>">
-                                                </div>
-                                                <div class="col-4 form-check mt-4">
-                                                    <input
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        id="slide_active_<?php echo $slide['id']; ?>"
-                                                        name="slides[<?php echo $slide['id']; ?>][is_active]"
-                                                        <?php if ($slide['is_active']) echo 'checked'; ?>>
-                                                    <label class="form-check-label small" for="slide_active_<?php echo $slide['id']; ?>">
-                                                        Active
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <th>Title</th>
+                                        <th>Views</th>
+                                        <th>Likes</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($popularStories as $story): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($story['title']); ?></td>
+                                            <td><?php echo (int)$story['views']; ?></td>
+                                            <td><?php echo (int)$story['likes']; ?></td>
+                                            <td><?php echo date('d M Y', strtotime($story['created_at'])); ?></td>
+                                        </tr>
                                     <?php endforeach; ?>
-
-                                    <button type="submit" class="btn btn-outline-silent">
-                                        Save slideshow
-                                    </button>
-                                </form>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
+                    <?php endif; ?>
 
-                    </div> <!-- /right column -->
                 </div>
 
-            </div>
-        </div>
-    </div>
+                <div class="card-dark mt-4">
+                    <h5 class="mb-3">Recent activity</h5>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                    <?php if (!$activities): ?>
+                        <p class="small text-muted mb-0">No recent activity</p>
+                    <?php else: ?>
+                        <ul class="list-unstyled mb-0">
+                            <?php foreach ($activities as $item): ?>
+                                <li class="d-flex justify-content-between align-items-center py-2 border-bottom"
+                                    style="border-color:#111827">
+
+                                    <div>
+                                        <?php if ($item['type'] === 'user'): ?>
+                                            👤 New user registered
+                                        <?php elseif ($item['type'] === 'story'): ?>
+                                            📖 Story published
+                                        <?php else: ?>
+                                            ⭐ Story featured
+                                        <?php endif; ?>
+
+                                        <div class="small text-white-50">
+                                            <?php echo htmlspecialchars($item['title']); ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="small text-white-50">
+                                        <?php echo date('d M H:i', strtotime($item['created_at'])); ?>
+                                    </div>
+
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
+
+            </div>
+
+
+
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('salesChart');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode($chartData['labels']); ?>,
+                datasets: [{
+                    label: 'Stories created',
+                    data: <?php echo json_encode($chartData['values']); ?>,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#3b82f6'
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: '#111827'
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#111827'
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
 </body>
 
 </html>

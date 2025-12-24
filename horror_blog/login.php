@@ -1,57 +1,181 @@
 <?php
+// --------------------
+// SESSION SECURITY
+// --------------------
+ini_set('session.use_strict_mode', 1);
+ini_set('session.use_only_cookies', 1);
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => isset($_SERVER['HTTPS']),
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
 session_start();
 require 'include/db.php';
 
-// always define this so PHP does not complain
+// --------------------
+// INIT
+// --------------------
 $errors = [];
 
-// If already logged in redirect
+// CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Redirect if already logged in
 if (!empty($_SESSION['user_id'])) {
-    if (!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-        header('Location: dashboard.php');
-    } else {
-        header('Location: index.php');
-    }
+    header('Location: dashboard.php');
     exit;
 }
 
+// Helper: get IP
+function getUserIp()
+{
+    return $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? 'unknown';
+}
+
+// --------------------
+// HANDLE LOGIN
+// --------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $login    = trim($_POST['login'] ?? '');
+    // CSRF check
+    if (
+        empty($_POST['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        $errors[] = 'Invalid request. Refresh and try again.';
+    }
+
+    $login    = strtolower(trim($_POST['login'] ?? ''));
     $password = $_POST['password'] ?? '';
+    $ip       = getUserIp();
 
     if ($login === '' || $password === '') {
         $errors[] = 'Login and password are required';
     }
 
+    // Rate limit (5 failures / 10 min)
     if (!$errors) {
-        $stmt = $pdo->prepare(
-            'SELECT id, username, email, password_hash, display_name, avatar, role
-               FROM users
-              WHERE username = :login OR email = :login
-              LIMIT 1'
-        );
-        $stmt->execute([':login' => $login]);
-        $user = $stmt->fetch();
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) 
+            FROM login_attempts
+            WHERE ip_address = :ip
+              AND success = 0
+              AND created_at >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+        ");
+        $stmt->execute([':ip' => $ip]);
 
-        if (!$user || !password_verify($password, $user['password_hash'])) {
-            $errors[] = 'Login or password is wrong';
-        } else {
-            $stmt = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = :id');
-            $stmt->execute([':id' => $user['id']]);
-
-            $_SESSION['user_id']     = $user['id'];
-            $_SESSION['user_name']   = $user['display_name'] ?: $user['username'];
-            $_SESSION['user_avatar'] = $user['avatar'];
-            $_SESSION['user_role']   = $user['role'];
-
-            if ($user['role'] === 'admin') {
-                header('Location: dashboard.php');
-            } else {
-                header('Location: index.php');
-            }
-            exit;
+        if ($stmt->fetchColumn() >= 5) {
+            $errors[] = 'Too many login attempts. Try again later.';
         }
+    }
+
+    // Check credentials
+    if (!$errors) {
+        $stmt = $pdo->prepare("
+            SELECT id, username, email, password_hash, display_name, avatar, role, locked_until
+            FROM users
+            WHERE username = :login OR email = :login
+            LIMIT 1
+        ");
+        $stmt->execute([':login' => $login]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Account locked
+        if ($user && $user['is_blocked']) {
+            $errors[] = 'Your account has been blocked by an administrator.';
+        }
+
+
+        // Wrong credentials
+        if (!$user || !password_verify($password, $user['password_hash'])) {
+
+            $errors[] = 'Login or password is wrong';
+
+            // Log failure
+            $stmt = $pdo->prepare("
+                INSERT INTO login_attempts (user_id, login_input, ip_address, success)
+                VALUES (NULL, :login, :ip, 0)
+            ");
+            $stmt->execute([
+                ':login' => $login,
+                ':ip' => $ip
+            ]);
+        }
+    }
+    $ip = $_SERVER['REMOTE_ADDR'];
+
+    $blocked = $pdo->prepare("
+    SELECT 1 FROM blocked_ips WHERE ip_address = :ip
+                                                ");
+    $blocked->execute([':ip' => $ip]);
+
+    if ($blocked->fetch()) {
+        die('Access denied.');
+    }
+
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $login = trim($_POST['login'] ?? '');
+
+    function geoLocate($ip)
+    {
+        $json = @file_get_contents("https://ipinfo.io/{$ip}/json");
+        if (!$json) return [null, null];
+        $data = json_decode($json, true);
+        return isset($data['loc']) ? explode(',', $data['loc']) : [null, null];
+    }
+
+    [$lat, $lng] = geoLocate($ip);
+
+    $stmt = $pdo->prepare("
+    INSERT INTO login_attempts
+    (login_input, ip_address, success, latitude, longitude)
+    VALUES (:l, :ip, 0, :lat, :lng)
+");
+    $stmt->execute([
+        ':l' => $login,
+        ':ip' => $ip,
+        ':lat' => $lat,
+        ':lng' => $lng
+    ]);
+
+
+    // SUCCESS
+    if (!$errors) {
+
+        // Log success
+        $stmt = $pdo->prepare("
+            INSERT INTO login_attempts (user_id, login_input, ip_address, success)
+            VALUES (:uid, :login, :ip, 1)
+        ");
+        $stmt->execute([
+            ':uid' => $user['id'],
+            ':login' => $login,
+            ':ip' => $ip
+        ]);
+
+        // Regenerate session
+        session_regenerate_id(true);
+
+        $_SESSION['user_id']     = $user['id'];
+        $_SESSION['user_name']   = $user['display_name'] ?: $user['username'];
+        $_SESSION['user_avatar'] = $user['avatar'];
+        $_SESSION['user_role']   = $user['role'];
+        $_SESSION['ip']          = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['ua']          = $_SERVER['HTTP_USER_AGENT'];
+        $_SESSION['last_activity'] = time();
+
+        unset($_SESSION['csrf_token']);
+
+        header('Location: dashboard.php');
+        exit;
     }
 }
 ?>
@@ -244,15 +368,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         required>
                 </div>
 
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
+
                 <button type="submit" class="btn btn-login mt-3">
                     Log in
                 </button>
+
             </form>
+            <p class="small-text">
+                <a href="forgot_password.php">Forgot your password?</a>
+            </p>
 
             <p class="small-text">
                 No account yet
                 <a href="signup.php">Sign up</a>
             </p>
+
 
             <div class="divider">
                 <span>or</span>

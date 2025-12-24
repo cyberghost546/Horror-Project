@@ -159,7 +159,7 @@ $users = $stmt->fetchAll();
     <div class="layout-wrapper">
 
         <aside class="sidebar">
-            <div class="sidebar-title">silent_evidence</div>
+            <div class="sidebar-title">Silent Evidence</div>
 
             <a href="dashboard.php" class="side-link"><span>🏠</span>Dashboard</a>
             <a href="stories_list.php" class="side-link"><span>📖</span>Stories</a>
