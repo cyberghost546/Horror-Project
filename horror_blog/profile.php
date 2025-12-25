@@ -233,6 +233,130 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
     .btn-save:hover {
       background-color: #111827;
     }
+
+    /* CHAT PANEL */
+    .chat-panel {
+      background: rgba(2, 6, 23, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 420px;
+    }
+
+    /* HEADER */
+    .chat-panel h6,
+    .chat-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #c7d2fe;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* STATUS DOT */
+    .chat-status {
+      font-size: 0.75rem;
+      color: #34d399;
+    }
+
+    /* MESSAGES CONTAINER */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      font-size: 0.85rem;
+    }
+
+    /* SCROLLBAR */
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 10px;
+    }
+
+    /* MESSAGE BUBBLES */
+    .chat-msg {
+      max-width: 85%;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    /* USER MESSAGE */
+    .chat-msg.you {
+      margin-left: auto;
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      color: #fff;
+    }
+
+    /* USERNAME */
+    .chat-msg strong {
+      display: block;
+      font-size: 0.7rem;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    /* INPUT AREA */
+    .chat-input {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      background: #020617;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e5e7eb;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    .chat-input input::placeholder {
+      color: #64748b;
+    }
+
+    /* SEND BUTTON */
+    .chat-input button {
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      border: none;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .chat-input button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+    }
+
+    .online-panel {
+      margin-top: 12px;
+    }
+
+    .online-user {
+      font-size: 0.8rem;
+      padding: 4px 0;
+      color: #34d399;
+    }
   </style>
 </head>
 
@@ -336,6 +460,8 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
         </div>
 
+
+
         <!-- Latest stories -->
         <div class="card card-dark">
           <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
@@ -356,6 +482,18 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
               </p>
             <?php endif; ?>
           </div>
+        </div>
+
+        <div class="card-dark chat-panel">
+
+          <h6>Your Messages</h6>
+
+          <div class="chat-messages" id="profileChat"></div>
+
+          <form id="profileChatForm" class="chat-input">
+            <input type="text" id="profileMessage" placeholder="Send message to admin">
+            <button type="submit">Send</button>
+          </form>
         </div>
 
         <!-- Bookmarked stories -->
@@ -449,6 +587,40 @@ $bookmarks = $bookmarksStmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const profileBox = document.getElementById('profileChat')
+    const profileForm = document.getElementById('profileChatForm')
+    const profileInput = document.getElementById('profileMessage')
+
+    function loadProfileChat() {
+      fetch('chat_fetch.php')
+        .then(res => res.text())
+        .then(html => {
+          profileBox.innerHTML = html
+          profileBox.scrollTop = profileBox.scrollHeight
+        })
+    }
+
+    profileForm.addEventListener('submit', e => {
+      e.preventDefault()
+      if (!profileInput.value.trim()) return
+
+      fetch('chat_send.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'message=' + encodeURIComponent(profileInput.value)
+      }).then(() => {
+        profileInput.value = ''
+        loadProfileChat()
+      })
+    })
+
+    setInterval(loadProfileChat, 2000)
+    loadProfileChat()
+  </script>
+
 </body>
 
 </html>

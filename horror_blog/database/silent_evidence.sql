@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2025 at 06:18 PM
+-- Generation Time: Dec 24, 2025 at 12:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -14,6 +14,33 @@ SET time_zone = "+00:00";
 --
 -- Database: `silent_evidence`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_audit_log`
+--
+
+CREATE TABLE `admin_audit_log` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `admin_id` int(10) UNSIGNED NOT NULL,
+  `action` varchar(100) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `blocked_ips`
+--
+
+CREATE TABLE `blocked_ips` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -78,27 +105,25 @@ INSERT INTO `categories` (`id`, `cat_key`, `label`, `tag`, `description`, `paren
 -- --------------------------------------------------------
 
 --
--- Table structure for table `contact_requests`
+-- Table structure for table `contact_messages`
 --
 
-CREATE TABLE `contact_requests` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(255) NOT NULL,
+CREATE TABLE `contact_messages` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `email` varchar(190) NOT NULL,
   `subject` varchar(255) NOT NULL,
   `message` text NOT NULL,
-  `status` enum('open','closed') NOT NULL DEFAULT 'open',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `contact_requests`
+-- Dumping data for table `contact_messages`
 --
 
-INSERT INTO `contact_requests` (`id`, `user_id`, `name`, `email`, `subject`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 'chris molina', 'chris@chris.com', 'help', 'test on two tree', 'open', '2025-11-30 11:06:31', '2025-11-30 11:09:07');
+INSERT INTO `contact_messages` (`id`, `name`, `email`, `subject`, `message`, `is_read`, `created_at`) VALUES
+(1, 'chris', 'chris@chris.com', '', '1. test\r\n2. test 2', 1, '2025-12-21 18:43:47');
 
 -- --------------------------------------------------------
 
@@ -120,6 +145,33 @@ CREATE TABLE `homepage_settings` (
 
 INSERT INTO `homepage_settings` (`id`, `show_latest`, `show_popular`, `show_featured`, `updated_at`) VALUES
 (1, 1, 1, 1, '2025-11-29 23:02:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `login_attempts`
+--
+
+CREATE TABLE `login_attempts` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `login_input` varchar(255) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `success` tinyint(1) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `login_attempts`
+--
+
+INSERT INTO `login_attempts` (`id`, `user_id`, `login_input`, `ip_address`, `success`, `created_at`, `latitude`, `longitude`) VALUES
+(1, NULL, '@chrischris', '127.0.0.1', 0, '2025-12-24 02:01:39', NULL, NULL),
+(2, 1, 'chris@chris.com', '127.0.0.1', 1, '2025-12-24 02:01:55', NULL, NULL),
+(3, NULL, '@chrismolina', '127.0.0.1', 0, '2025-12-24 02:02:27', NULL, NULL),
+(4, 1, 'chris@chris.com', '127.0.0.1', 1, '2025-12-24 02:02:54', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -248,20 +300,53 @@ CREATE TABLE `users` (
   `bio` text DEFAULT NULL,
   `role` enum('user','admin') NOT NULL DEFAULT 'user',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `last_login` datetime DEFAULT NULL
+  `last_login` datetime DEFAULT NULL,
+  `locked_until` datetime DEFAULT NULL,
+  `reset_token` varchar(64) DEFAULT NULL,
+  `reset_expires` datetime DEFAULT NULL,
+  `is_blocked` tinyint(1) NOT NULL DEFAULT 0,
+  `blocked_reason` varchar(255) DEFAULT NULL,
+  `blocked_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `display_name`, `avatar`, `bio`, `role`, `created_at`, `last_login`) VALUES
-(1, 'chrismolina', 'chris@chris.com', '$2y$10$GyO.1rYTydKDmmVk49at2uSnxvLDm4YBbD0/Dr5NO1E/i8mRPDfui', 'Chris', 'uploads/avatars/avatar_1_1763198680.jpg', 'bidnv;soNEOnb\'o', 'admin', '2025-11-15 10:19:37', '2025-12-21 10:53:51'),
-(2, 'testtest', 'test@test.com', '$2y$10$E9NT4Y1RWYFavJ2FFPG7V.3Lr4DhMUguizsZgs3aXoJyCDgLC5D..', 'test test', 'uploads/avatars/avatar_2_1763200718.webp', '', 'user', '2025-11-15 10:57:57', '2025-12-21 00:36:21');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `display_name`, `avatar`, `bio`, `role`, `created_at`, `last_login`, `locked_until`, `reset_token`, `reset_expires`, `is_blocked`, `blocked_reason`, `blocked_at`) VALUES
+(1, 'chrismolina', 'chris@chris.com', '$2y$10$GyO.1rYTydKDmmVk49at2uSnxvLDm4YBbD0/Dr5NO1E/i8mRPDfui', 'Chris', 'uploads/avatars/avatar_1_1763198680.jpg', 'bidnv;soNEOnb\'o', 'admin', '2025-11-15 10:19:37', '2025-12-23 22:50:39', NULL, NULL, NULL, 0, NULL, NULL),
+(2, 'testtest', 'test@test.com', '$2y$10$E9NT4Y1RWYFavJ2FFPG7V.3Lr4DhMUguizsZgs3aXoJyCDgLC5D..', 'test test', 'uploads/avatars/avatar_2_1763200718.webp', '', 'user', '2025-11-15 10:57:57', '2025-12-21 00:36:21', NULL, NULL, NULL, 0, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_security_events`
+--
+
+CREATE TABLE `user_security_events` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `event_type` varchar(50) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `admin_audit_log`
+--
+ALTER TABLE `admin_audit_log`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `blocked_ips`
+--
+ALTER TABLE `blocked_ips`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ip_address` (`ip_address`);
 
 --
 -- Indexes for table `carousel_slides`
@@ -277,17 +362,25 @@ ALTER TABLE `categories`
   ADD UNIQUE KEY `cat_key` (`cat_key`);
 
 --
--- Indexes for table `contact_requests`
+-- Indexes for table `contact_messages`
 --
-ALTER TABLE `contact_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+ALTER TABLE `contact_messages`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `homepage_settings`
 --
 ALTER TABLE `homepage_settings`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `login_input` (`login_input`),
+  ADD KEY `ip_address` (`ip_address`),
+  ADD KEY `created_at` (`created_at`);
 
 --
 -- Indexes for table `password_resets`
@@ -335,8 +428,26 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `uniq_email` (`email`);
 
 --
+-- Indexes for table `user_security_events`
+--
+ALTER TABLE `user_security_events`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `admin_audit_log`
+--
+ALTER TABLE `admin_audit_log`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `blocked_ips`
+--
+ALTER TABLE `blocked_ips`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `carousel_slides`
@@ -351,10 +462,16 @@ ALTER TABLE `categories`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT for table `contact_requests`
+-- AUTO_INCREMENT for table `contact_messages`
 --
-ALTER TABLE `contact_requests`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `contact_messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
@@ -393,14 +510,14 @@ ALTER TABLE `users`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- Constraints for dumped tables
+-- AUTO_INCREMENT for table `user_security_events`
 --
+ALTER TABLE `user_security_events`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for table `contact_requests`
+-- Constraints for dumped tables
 --
-ALTER TABLE `contact_requests`
-  ADD CONSTRAINT `contact_requests_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `password_resets`

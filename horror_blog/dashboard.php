@@ -369,6 +369,59 @@ $popularStories = $stmt->fetchAll();
             background-color: #111827;
             color: #ffffff;
         }
+
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            height: 420px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .chat-status {
+            color: #34d399;
+            font-size: 0.75rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .chat-msg {
+            margin-bottom: 6px;
+        }
+
+        .chat-msg.you {
+            text-align: right;
+            color: #a5b4fc;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            background: #020617;
+            border: 1px solid #111827;
+            color: #e5e7eb;
+            padding: 8px 12px;
+            border-radius: 999px;
+        }
+
+        .chat-input button {
+            padding: 8px 16px;
+            border-radius: 999px;
+        }
     </style>
 </head>
 
@@ -500,6 +553,24 @@ $popularStories = $stmt->fetchAll();
                     <?php endif; ?>
 
                 </div>
+                <div class="card-dark chat-panel">
+                    <div class="chat-header">
+                        <strong>Team Chat</strong>
+                        <span class="chat-status">● Online</span>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages"></div>
+
+                    <form id="chatForm" class="chat-input">
+                        <input
+                            type="text"
+                            id="chatMessage"
+                            placeholder="Type a message..."
+                            autocomplete="off">
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+
 
                 <div class="card-dark mt-4">
                     <h5 class="mb-3">Recent activity</h5>
@@ -589,6 +660,38 @@ $popularStories = $stmt->fetchAll();
                 }
             }
         });
+
+        const chatBox = document.getElementById('chatMessages')
+        const chatForm = document.getElementById('chatForm')
+        const chatInput = document.getElementById('chatMessage')
+
+        function loadChat() {
+            fetch('chat_fetch.php')
+                .then(res => res.text())
+                .then(html => {
+                    chatBox.innerHTML = html
+                    chatBox.scrollTop = chatBox.scrollHeight
+                })
+        }
+
+        chatForm.addEventListener('submit', e => {
+            e.preventDefault()
+            if (!chatInput.value.trim()) return
+
+            fetch('chat_send.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'message=' + encodeURIComponent(chatInput.value)
+            }).then(() => {
+                chatInput.value = ''
+                loadChat()
+            })
+        })
+
+        setInterval(loadChat, 2000)
+        loadChat()
     </script>
 
 

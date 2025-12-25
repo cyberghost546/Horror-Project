@@ -141,7 +141,7 @@ $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1
 
             <div class="col-md-4">
                 <a href="users_list.php" class="text-decoration-none text-white">
-                    <div class="stat-card">
+                    <div class="stat-card text-center">
                         <div class="stat-icon">👥</div>
                         <div class="stat-value"><?php echo (int)$totalUsers; ?></div>
                         <div class="stat-label">Total users</div>
@@ -152,7 +152,7 @@ $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1
 
             <div class="col-md-4">
                 <a href="users_list.php" class="text-decoration-none text-white">
-                    <div class="stat-card">
+                    <div class="stat-card text-center">
                         <div class="stat-icon">📚</div>
                         <div class="stat-value"><?php echo (int)$totalStories; ?></div>
                         <div class="stat-label">Total stories</div>
@@ -163,7 +163,7 @@ $totalFeatured = $pdo->query('SELECT COUNT(*) FROM stories WHERE is_featured = 1
 
             <div class="col-md-4">
                 <a href="users_list.php" class="text-decoration-none text-white">
-                    <div class="stat-card">
+                    <div class="stat-card text-center">
                         <div class="stat-icon">⭐</div>
                         <div class="stat-value"><?php echo (int)$totalFeatured; ?></div>
                         <div class="stat-label">Featured stories</div>
